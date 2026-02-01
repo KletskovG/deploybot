@@ -23,7 +23,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src --ext .ts,.js",
     "lint:fix": "eslint src --ext .ts,.js --fix",
-    "lint:check": "eslint src --ext .ts,.js --max-warnings 0"
+    "reb": "git rebase origin/main"
   },
   "dependencies": {
     "@fastify/cors": "9.0.1",
