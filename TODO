@@ -1,0 +1,2 @@
+- Update eslint, remove this - if (!value) return defaultValue; 
+- Move Routes to enum 
