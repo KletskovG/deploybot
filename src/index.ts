@@ -11,13 +11,13 @@ async function main(): Promise<void> {
   info(`Server PORT: ${config.SERVER_PORT}`);
 
   try {
-    // Start Fastify server
-    info('Starting server...');
-    const server = await startServer();
-
     // Start Telegram bot
     info('Starting bot...');
-    const _bot = await startBot();
+    const bot = await startBot();
+
+    // Start Fastify server
+    info('Starting server...');
+    const server = await startServer(bot);
 
     info('✅ Application started successfully!');
 

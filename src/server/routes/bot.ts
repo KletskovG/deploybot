@@ -1,6 +1,9 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { BotStatus } from '@typings/bot';
+
+// TODO: Delete this handler
+
 // This will be populated by the bot module
 export const botStatus: BotStatus = {
   isRunning: false,
