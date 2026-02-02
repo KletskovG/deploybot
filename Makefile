@@ -7,6 +7,9 @@ build:
 start:
 	npm run start
 
+test:
+	npm run test
+
 docker-env:
 	cp .config/env/.env.production deployment/docker/deploybot.env
 

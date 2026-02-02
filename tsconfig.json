@@ -18,11 +18,19 @@
     "baseUrl": ".",
     "paths": {
       "@server/*": ["./src/server/*"],
+      "@server": ["./src/server"],
       "@bot/*": ["./src/bot/*"],
+      "@bot": ["./src/bot"],
       "@config/*": ["./src/config/*"],
+      "@config": ["./src/config"],
       "@logger/*": ["./src/logger/*"],
+      "@logger": ["./src/logger"],
       "@typings/*": ["./src/typings/*"],
-      "@db/*": ["./src/db/*"]
+      "@typings": ["./src/typings"],
+      "@db/*": ["./src/db/*"],
+      "@db": ["./src/db"],
+      "@lib/*": ["./src/lib/*"],
+      "@lib": ["./src/lib"]
     }
   },
   "include": ["src/**/*.ts"],

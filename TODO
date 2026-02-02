@@ -1,5 +1,6 @@
-- Update eslint, remove this - if (!value) return defaultValue; 
-- Move Routes to enum 
-- Development docker compose and environment
+- prod and dev environments for DB 
+- Rich testing of DB and server handlers - also in CI
 - Script for nginx config release
 - Create NGINX basic routes - /bot and /budget
+- Update eslint, remove this - if (!value) return defaultValue; 
+- Read about YDB migrations

@@ -1,10 +1,7 @@
 import 'dotenv/config';
 
-
-
 import { startBot } from '@bot/index';
 import { config } from '@config/environment';
-import { connect } from '@db/index';
 import { info, error } from '@logger/index';
 import { startServer } from '@server/index';
 
@@ -12,13 +9,9 @@ async function main(): Promise<void> {
   info('🚀 Starting DeployBot application...');
   info(`Server PORT: ${config.SERVER_PORT}`);
 
-
-
   try {
     info('Starting bot...');
     const bot = await startBot();
-
-    connect(bot);
 
     info('Starting server...');
     const server = await startServer(bot);
