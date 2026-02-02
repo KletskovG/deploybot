@@ -1,3 +1,5 @@
 - Update eslint, remove this - if (!value) return defaultValue; 
 - Move Routes to enum 
 - Development docker compose
+- Script for nginx config release
+- Create NGINX basic routes - /bot and /budget

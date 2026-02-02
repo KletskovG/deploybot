@@ -1,30 +1,33 @@
-// import cors from '@fastify/cors';
+import cors from '@fastify/cors';
 import Fastify, { FastifyInstance } from 'fastify';
+import { Bot } from 'grammy';
 
 import { config } from '@config/environment';
 import { error } from '@logger/index';
 import { botRoutes } from '@server/routes/bot';
-import { healthRoutes } from '@server/routes/health';
+import { configureHealthRoutes } from '@server/routes/health';
 
-export async function createServer(): Promise<FastifyInstance> {
+export async function createServer(bot?: Bot): Promise<FastifyInstance> {
   const fastify = Fastify({
     logger: {
       level: config.LOG_LEVEL,
     },
   });
 
-  // await fastify.register(cors, {
-  //   origin: true,
-  // });
+  await fastify.register(cors, {
+    origin: true,
+  });
 
-  await fastify.register(healthRoutes);
+  const healthRoutesWrapped = configureHealthRoutes(bot);
+
+  await fastify.register(healthRoutesWrapped);
   await fastify.register(botRoutes);
 
   return fastify;
 }
 
-export async function startServer(): Promise<FastifyInstance> {
-  const fastify = await createServer();
+export async function startServer(bot?: Bot): Promise<FastifyInstance> {
+  const fastify = await createServer(bot);
 
   try {
     await fastify.listen({
