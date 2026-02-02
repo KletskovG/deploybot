@@ -1,21 +1,25 @@
 import 'dotenv/config';
 
+
+
 import { startBot } from '@bot/index';
 import { config } from '@config/environment';
+import { connect } from '@db/index';
 import { info, error } from '@logger/index';
 import { startServer } from '@server/index';
 
 async function main(): Promise<void> {
   info('🚀 Starting DeployBot application...');
-  // info(`Environment: ${config.NODE_ENV}`);
   info(`Server PORT: ${config.SERVER_PORT}`);
 
+
+
   try {
-    // Start Telegram bot
     info('Starting bot...');
     const bot = await startBot();
 
-    // Start Fastify server
+    connect(bot);
+
     info('Starting server...');
     const server = await startServer(bot);
 

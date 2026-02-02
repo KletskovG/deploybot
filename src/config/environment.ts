@@ -5,14 +5,16 @@ export interface Environment {
   SERVER_HOST: string;
   LOG_LEVEL: string;
   CHAT_ID: number;
+  YDB_CONNECTION_STRING: string;
+  YDB_KEY_PATH: string;
 }
 
-function getEnvVar(key: string, defaultValue?: string): string {
+function getEnvVar(key: string, required = true): string {
   const value = process.env[key];
-  if (!value && !defaultValue) {
+  if (!value && required) {
     throw new Error(`Environment variable ${key} is required`);
   }
-  return value || String(defaultValue);
+  return value || '';
 }
 
 function getEnvNumber(key: string): number {
@@ -35,10 +37,12 @@ function getEnvNumber(key: string): number {
 // }
 
 export const config: Environment = {
-  BOT_TOKEN: getEnvVar('BOT_TOKEN'),
+  BOT_TOKEN: getEnvVar('BOT_TOKEN', false),
   NODE_ENV: getEnvVar('NODE_ENV'),
   SERVER_PORT: getEnvNumber('SERVER_PORT'),
-  SERVER_HOST: getEnvVar('SERVER_HOST', '0.0.0.0'),
-  LOG_LEVEL: getEnvVar('LOG_LEVEL', 'info'),
+  SERVER_HOST: getEnvVar('SERVER_HOST'),
+  LOG_LEVEL: getEnvVar('LOG_LEVEL'),
   CHAT_ID: getEnvNumber('CHAT_ID'),
+  YDB_CONNECTION_STRING: getEnvVar('YDB_CONNECTION_STRING'),
+  YDB_KEY_PATH: getEnvVar('YDB_KEY_PATH'),
 };

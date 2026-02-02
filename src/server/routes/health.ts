@@ -4,7 +4,7 @@ import { Bot } from 'grammy';
 import { config } from '@config/environment';
 import { MESSAGES } from '@server/consts';
 
-export function configureHealthRoutes(bot?: Bot) {
+export function configureHealthRoutes(bot?: Bot | null) {
   return async (fastify: FastifyInstance) => {
     fastify.get('/health', async (_request: FastifyRequest, _reply: FastifyReply) => {
 
