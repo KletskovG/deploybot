@@ -2,16 +2,13 @@ version: '3.8'
 
 services:
   deploybot:
-    build:
-      context: ../..
-      dockerfile: deployment/docker/Dockerfile
+    image: ghcr.io/kletskovg/deploybot:latest
     container_name: deploybot
-    image: deploybot:latest
     ports:
       - "3000:3000"
     env_file:
       - deploybot.env
-    restart: on-failure
+    restart: unless-stopped
     mem_limit: 512m
     networks:
       - deploybot-network
@@ -20,9 +17,27 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     # Uncomment for persistent logs volume
     # volumes:
     #   - deploybot-logs:/app/logs
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: deploybot-watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json:ro
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300
+      - WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_INCLUDE_RESTARTING=true
+      - WATCHTOWER_ROLLING_RESTART=true
+    networks:
+      - deploybot-network
 
 networks:
   deploybot-network:
