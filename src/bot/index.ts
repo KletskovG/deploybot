@@ -10,9 +10,13 @@ import { updateBotStatus } from '@server/routes/bot';
 import { LOGS, MESSAGES } from './consts';
 
 
-export async function startBot(): Promise<Bot> {
+export async function startBot(): Promise<Bot | null> {
   if (!config.BOT_TOKEN) {
-    throw new Error('BOT_TOKEN is required');
+    if (config.NODE_ENV === 'production') {
+      throw new Error('BOT_TOKEN is required');
+    } else if (config.NODE_ENV === 'development') {
+      return null;
+    }
   }
 
   const bot = new Bot(config.BOT_TOKEN);

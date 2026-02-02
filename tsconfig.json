@@ -21,7 +21,8 @@
       "@bot/*": ["./src/bot/*"],
       "@config/*": ["./src/config/*"],
       "@logger/*": ["./src/logger/*"],
-      "@typings/*": ["./src/typings/*"]
+      "@typings/*": ["./src/typings/*"],
+      "@db/*": ["./src/db/*"]
     }
   },
   "include": ["src/**/*.ts"],

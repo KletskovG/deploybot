@@ -1,5 +1,6 @@
-import { defineConfig } from 'vite';
 import { resolve } from 'path';
+
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
@@ -18,6 +19,7 @@ export default defineConfig({
         'path',
         'url',
         'http',
+        'http2',
         'https',
         'stream',
         'crypto',
@@ -34,6 +36,7 @@ export default defineConfig({
         'readline',
         'zlib',
         'assert',
+        'times/promises',
         // Dependencies (keep external for Node.js)
         'grammy',
         'fastify',
@@ -54,6 +57,7 @@ export default defineConfig({
       '@config': resolve(__dirname, 'src/config'),
       '@logger': resolve(__dirname, 'src/logger'),
       '@typings': resolve(__dirname, 'src/typings'),
+      '@db': resolve(__dirname, 'src/db'),
     },
   },
 });

@@ -7,7 +7,7 @@ import { error } from '@logger/index';
 import { botRoutes } from '@server/routes/bot';
 import { configureHealthRoutes } from '@server/routes/health';
 
-export async function createServer(bot?: Bot): Promise<FastifyInstance> {
+export async function createServer(bot?: Bot | null): Promise<FastifyInstance> {
   const fastify = Fastify({
     logger: {
       level: config.LOG_LEVEL,
@@ -26,7 +26,7 @@ export async function createServer(bot?: Bot): Promise<FastifyInstance> {
   return fastify;
 }
 
-export async function startServer(bot?: Bot): Promise<FastifyInstance> {
+export async function startServer(bot?: Bot | null): Promise<FastifyInstance> {
   const fastify = await createServer(bot);
 
   try {
