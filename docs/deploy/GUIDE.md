@@ -35,16 +35,6 @@ The workflow file is at `.github/workflows/release.yml` and automatically:
 
 ### Step 2: Choose Image Visibility
 
-**Option A: Public Image (Simpler)**
-
-Make the image public so no authentication is needed:
-
-1. Go to: `https://github.com/users/KletskovG/packages`
-2. Find `deploybot` package
-3. Package Settings → Change visibility → Public
-
-Skip to Step 4 if using public images.
-
 **Option B: Private Image (More Secure)**
 
 Keep image private and authenticate on VPS (recommended for production).
@@ -174,42 +164,6 @@ docker logs deploybot-watchtower -f
 4. Release title: `v1.0.0` or descriptive name
 5. Describe changes
 6. Click "Publish release"
-
-### Method 2: GitHub CLI
-
-```bash
-# Install gh CLI (if not installed)
-# https://cli.github.com/
-
-# Create release
-gh release create v1.0.0 --title "v1.0.0" --notes "Release notes here"
-```
-
-### Method 3: Git Tags + Push
-
-```bash
-# Create and push tag
-git tag v1.0.0
-git push origin v1.0.0
-
-# Then create release from tag in GitHub UI
-```
-
----
-
-## Deployment Timeline
-
-After publishing a release:
-
-1. **0 sec:** GitHub Actions starts building
-2. **1-3 min:** Image built and pushed to registry
-3. **3-8 min:** Watchtower detects new image (polls every 5 min)
-4. **8-9 min:** Watchtower pulls image and restarts container
-5. **Done:** New version running
-
-**Total time:** ~5-10 minutes
-
----
 
 ## Manual Operations
 

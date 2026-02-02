@@ -24,7 +24,7 @@ services:
     #   - deploybot-logs:/app/logs
 
   watchtower:
-    image: containrrr/watchtower:latest
+    image: nickfedor/watchtower:latest
     container_name: deploybot-watchtower
     restart: unless-stopped
     volumes:
