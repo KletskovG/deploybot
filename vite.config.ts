@@ -3,6 +3,18 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  test: {
+    globals: true,
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
+    testTimeout: 30000,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.test.ts', 'src/index.ts'],
+    },
+  },
   build: {
     target: 'node22',
     outDir: 'dist',
@@ -59,6 +71,7 @@ export default defineConfig({
       '@logger': resolve(__dirname, 'src/logger'),
       '@typings': resolve(__dirname, 'src/typings'),
       '@db': resolve(__dirname, 'src/db'),
+      '@lib': resolve(__dirname, 'src/lib'),
     },
   },
 });

@@ -38,3 +38,13 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Setup YDB credentials
+        run: |
+          echo "${{ secrets.YDB_KEY }}" | base64 -d > deployment/docker/authorized_key.json
+
+      - name: Run tests
+        run: npm run test
+        env:
+          YDB_CONNECTION_STRING: ${{ secrets.YDB_CONNECTION }}
+          YDB_KEY_PATH: ${{ github.workspace }}/deployment/docker/authorized_key.json

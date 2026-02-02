@@ -39,6 +39,7 @@ module.exports = {
     'max-len': ['error', { 'code': 100, 'tabWidth': 2 }],
     'eol-last': ['error', 'always'],
     'no-trailing-spaces': 'error',
+    'no-multiple-empty-lines': ['error', { 'max': 1, 'maxEOF': 0, 'maxBOF': 0 }],
     'object-curly-spacing': ['error', 'always'],
     'array-bracket-spacing': ['error', 'never'],
     'computed-property-spacing': ['error', 'never'],

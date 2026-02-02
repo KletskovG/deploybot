@@ -23,7 +23,9 @@
     "copy:env:dist": "cp .env dist/.env 2>/dev/null || echo 'Warning: .env file not found, skipping copy' && cp authorized_key.json dist/authorized_key.json 2>/dev/null || echo 'Warning: authorized_key.json file not found, skipping copy'",
     "copy:env:dev": "cp .config/env/.env.development ./.env 2>/dev/null || echo 'Warning: .env file not found, skipping copy' && cp authorized_key.json dist/authorized_key.json 2>/dev/null || echo 'Warning: authorized_key.json file not found, skipping copy'",
     "copy:env": "cp .config/env/.env.production ./.env 2>/dev/null || echo 'Warning: .env file not found, skipping copy' && cp authorized_key.json dist/authorized_key.json 2>/dev/null || echo 'Warning: authorized_key.json file not found, skipping copy'",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "lint": "eslint src --ext .ts,.js",
     "lint:fix": "eslint src --ext .ts,.js --fix",
     "typechecking": "tsc --noEmit",
@@ -53,6 +55,7 @@
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-import": "2.32.0",
     "vite": "6.1.0",
-    "vite-node": "3.0.4"
+    "vite-node": "3.0.4",
+    "vitest": "4.0.18"
   }
 }

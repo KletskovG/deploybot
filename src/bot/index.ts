@@ -9,7 +9,6 @@ import { updateBotStatus } from '@server/routes/bot';
 
 import { LOGS, MESSAGES } from './consts';
 
-
 export async function startBot(): Promise<Bot | null> {
   if (!config.BOT_TOKEN) {
     if (config.NODE_ENV === 'production') {

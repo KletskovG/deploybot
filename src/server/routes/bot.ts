@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+import { ROUTE } from '@server/consts';
 import { BotStatus } from '@typings/bot';
 
 // TODO: Delete this handler
@@ -18,7 +19,7 @@ export function updateBotStatus(status: Partial<typeof botStatus>): void {
 }
 
 export async function botRoutes(fastify: FastifyInstance): Promise<void> {
-  fastify.get('/bot/status', async (_request: FastifyRequest, _reply: FastifyReply) => {
+  fastify.get(ROUTE.BOT_STATUS, async (_request: FastifyRequest, _reply: FastifyReply) => {
     return {
       ...botStatus,
       uptime: botStatus.startTime ? Date.now() - botStatus.startTime.getTime() : 0,
