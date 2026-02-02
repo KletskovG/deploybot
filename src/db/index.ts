@@ -1,6 +1,3 @@
-import * as path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import { ServiceAccountCredentialsProvider } from '@ydbjs/auth-yandex-cloud';
 import { Driver } from '@ydbjs/core';
 import { YDBError } from '@ydbjs/error';
@@ -13,8 +10,8 @@ import { info, error as logError } from '@logger/index';
 export async function connect(bot?: Bot | null): Promise<void> {
   const connectionString = config.YDB_CONNECTION_STRING;
 
-
-  const keyPath = path.join(path.dirname(fileURLToPath(import.meta.url)), config.YDB_KEY_PATH);
+  // Use the path directly from environment variable (for Docker volume mount)
+  const keyPath = config.YDB_KEY_PATH;
   const credentialsProvider = ServiceAccountCredentialsProvider.fromFile(keyPath);
   const driver = new Driver(connectionString, { credentialsProvider });
 

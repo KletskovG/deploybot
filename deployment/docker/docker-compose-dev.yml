@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  deploybot:
+    image: localhot/deploybot:latest
+    container_name: deploybot
+    ports:
+      - "3001:3001"
+    env_file:
+      - deploybotdev.env
+    restart: unless-stopped
+    mem_limit: 512m
+    networks:
+      - deploybot-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    volumes:
+      - ./authorized_key.json:/app/secrets/authorized_key.json:ro
+
+networks:
+  deploybot-network:
+    driver: bridge
+
+# Uncomment for persistent volumes
+# volumes:
+#   deploybot-logs:

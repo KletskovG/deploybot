@@ -10,9 +10,7 @@ start:
 docker-env:
 	cp .config/env/.env.production deployment/docker/deploybot.env
 
-docker-build:
-	docker compose -f deployment/docker/docker-compose.yml build
-
+# Production
 docker-up:
 	docker compose -f deployment/docker/docker-compose.yml up -d
 
@@ -31,10 +29,25 @@ docker-ps:
 docker-pull:
 	docker compose -f deployment/docker/docker-compose.yml pull
 
-docker-deploy-local:
-	docker-build docker-up
-
 docker-deploy: docker-pull docker-up
+
+# Development
+docker-build-dev:
+	docker build -t localhot/deploybot:latest -f deployment/docker/Dockerfile.dev .
+
+docker-up-dev:
+	docker compose -f deployment/docker/docker-compose-dev.yml up -d
+
+docker-down-dev:
+	docker compose -f deployment/docker/docker-compose-dev.yml down
+
+docker-logs-dev:
+	docker compose -f deployment/docker/docker-compose-dev.yml logs -f
+
+docker-ps-dev:
+	docker compose -f deployment/docker/docker-compose-dev.yml ps
+
+docker-deploy-dev: docker-build-dev docker-up-dev
 
 docker-clean:
 	docker image prune

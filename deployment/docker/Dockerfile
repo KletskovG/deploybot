@@ -16,8 +16,6 @@ COPY package*.json ./
 RUN npm i
 
 COPY --from=builder /app/dist ./dist
-COPY  authorized_key.json ./authorized_key.json
-COPY  authorized_key.json ./dist/authorized_key.json
 
 EXPOSE 3000
 

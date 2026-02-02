@@ -19,9 +19,8 @@ services:
         max-file: "3"
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
-    # Uncomment for persistent logs volume
-    # volumes:
-    #   - deploybot-logs:/app/logs
+    volumes:
+      - ./authorized_key.json:/app/secrets/authorized_key.json:ro
 
   watchtower:
     image: nickfedor/watchtower:latest

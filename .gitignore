@@ -139,4 +139,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 deployment/docker/deploybot.env
+deployment/docker/deploybotdev.env
 authorized_key.json
