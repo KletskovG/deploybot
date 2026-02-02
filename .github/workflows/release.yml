@@ -35,7 +35,7 @@ jobs:
         run: npm run build
 
   build-and-push:
-    needs: lint-and-build
+    needs: checks
     runs-on: ubuntu-latest
     permissions:
       contents: read
