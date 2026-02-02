@@ -7,6 +7,8 @@ import { config } from '@config/environment';
 import { info } from '@logger/index';
 import { updateBotStatus } from '@server/routes/bot';
 
+import { LOGS, MESSAGES } from './consts';
+
 
 export async function startBot(): Promise<Bot> {
   if (!config.BOT_TOKEN) {
@@ -42,8 +44,8 @@ export async function startBot(): Promise<Bot> {
     errorCount: 0,
   });
 
-  await bot.api.sendMessage(`${config.CHAT_ID}`, 'Hello, world!');
-  info('Bot started successfully');
+  await bot.api.sendMessage(`${config.CHAT_ID}`, MESSAGES.START);
+  info(LOGS.BOT_STARTED);
 
   bot.start();
 

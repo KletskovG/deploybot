@@ -14,9 +14,9 @@ export async function handleStatus(ctx: Context): Promise<void> {
   const uptimeMinutes = Math.floor((uptime % 3600) / 60);
 
   await ctx.reply(
-    '🟢 *Bot Status: Online*\n\n' +
-    `⏱ Uptime: ${uptimeHours}h ${uptimeMinutes}m\n` +
-    `🕐 Current Time: ${new Date().toLocaleString()}`,
+    'Bot is OK\n\n' +
+    `Uptime: ${uptimeHours}h ${uptimeMinutes}m\n` +
+    `Current Time: ${new Date().toLocaleString()}`,
     { parse_mode: 'Markdown' },
   );
 }
