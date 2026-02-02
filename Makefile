@@ -28,9 +28,11 @@ docker-restart:
 docker-ps:
 	docker compose -f deployment/docker/docker-compose.yml ps
 
-docker-pull: docker compose -f deployment/docker/docker-compose.yml pull
+docker-pull:
+	docker compose -f deployment/docker/docker-compose.yml pull
 
-docker-deploy-local: docker-build docker-up
+docker-deploy-local:
+	docker-build docker-up
 
 docker-deploy: docker-pull docker-up
 
