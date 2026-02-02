@@ -36,7 +36,8 @@ export default defineConfig({
         'readline',
         'zlib',
         'assert',
-        'times/promises',
+        'timers',
+        'timers/promises',
         // Dependencies (keep external for Node.js)
         'grammy',
         'fastify',
