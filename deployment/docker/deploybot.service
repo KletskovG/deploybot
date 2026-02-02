@@ -1,0 +1,18 @@
+[Unit]
+Description=DeployBot Docker Compose Service
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/d91580433832/deploybot
+ExecStart=/usr/bin/docker compose -f deployment/docker/docker-compose.yml up -d
+ExecStop=/usr/bin/docker compose -f deployment/docker/docker-compose.yml down
+TimeoutStartSec=60
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -2,6 +2,7 @@ export interface Environment {
   BOT_TOKEN: string;
   NODE_ENV: string;
   SERVER_PORT: number;
+  SERVER_HOST: string;
   LOG_LEVEL: string;
   CHAT_ID: number;
 }
@@ -37,6 +38,7 @@ export const config: Environment = {
   BOT_TOKEN: getEnvVar('BOT_TOKEN'),
   NODE_ENV: getEnvVar('NODE_ENV'),
   SERVER_PORT: getEnvNumber('SERVER_PORT'),
+  SERVER_HOST: getEnvVar('SERVER_HOST', '0.0.0.0'),
   LOG_LEVEL: getEnvVar('LOG_LEVEL', 'info'),
   CHAT_ID: getEnvNumber('CHAT_ID'),
 };

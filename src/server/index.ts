@@ -29,7 +29,7 @@ export async function startServer(): Promise<FastifyInstance> {
   try {
     await fastify.listen({
       port: config.SERVER_PORT,
-      // host: config.SERVER_HOST,
+      host: config.SERVER_HOST,
     });
 
     fastify.log.info(`Server listening on ${config.SERVER_PORT}`);

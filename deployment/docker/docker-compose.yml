@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  deploybot:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
+    container_name: deploybot
+    image: deploybot:latest
+    ports:
+      - "3000:3000"
+    env_file:
+      - deploybot.env
+    restart: on-failure
+    mem_limit: 512m
+    networks:
+      - deploybot-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Uncomment for persistent logs volume
+    # volumes:
+    #   - deploybot-logs:/app/logs
+
+networks:
+  deploybot-network:
+    driver: bridge
+
+# Uncomment for persistent volumes
+# volumes:
+#   deploybot-logs:
