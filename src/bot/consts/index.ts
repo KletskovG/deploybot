@@ -1,5 +1,5 @@
 export const MESSAGES = {
-  START: 'Bot is up and running!',
+  START: 'Maker server and bot booted',
 };
 
 export const LOGS = {
