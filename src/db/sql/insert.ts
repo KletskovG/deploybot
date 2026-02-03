@@ -27,6 +27,7 @@ export const buildInsertQuery = (transactions: ITransaction[]): string => {
   const list = transactionList(transactions);
   return ` 
     INSERT INTO ${TABLES.transactions} (id, date, expense, category, note, timestamp)
-    VALUES ${list};
+    VALUES ${list}
+    RETURNING *;
   `;
 };

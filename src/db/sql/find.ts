@@ -1,7 +1,5 @@
 import { TABLES } from '@db/consts';
-import { formatDate } from '@lib';
 import { IFindFiltersOptions } from '@typings/common/findFilters';
-import { ITransactionYDB , ITransaction } from '@typings/core/transaction';
 
 const findFilters = (filtersOptions: IFindFiltersOptions): string => {
   const { date, expense, category, note } = filtersOptions;
@@ -39,17 +37,4 @@ export const buildFindQuery = (filtersOptions: IFindFiltersOptions): string => {
     LIMIT 100
   `;
   return query;
-};
-
-export const readFindResult = (result: ITransactionYDB[]): ITransaction[] => {
-  return result.map(item => {
-    return {
-      id: item.id.toString(),
-      date: formatDate(new Date(item.date)),
-      expense: Number(item.expense),
-      category: item.category?.toString(),
-      note: item.note?.toString(),
-      timestamp: item.timestamp.toString(),
-    };
-  });
 };

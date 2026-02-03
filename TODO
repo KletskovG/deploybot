@@ -1,3 +1,4 @@
+- Add default date when date is not presented
 - prod and dev environments for DB 
 - Rich testing of DB and server handlers - also in CI
 - Script for nginx config release
