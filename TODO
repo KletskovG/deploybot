@@ -4,3 +4,4 @@
 - Create NGINX basic routes - /bot and /budget
 - Update eslint, remove this - if (!value) return defaultValue; 
 - Read about YDB migrations
+- Refactor routes and handler. Handler have to contain ONLY business logic, no http stuff

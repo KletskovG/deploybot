@@ -7,3 +7,12 @@ export interface ITransaction {
     note?: string | null;
     timestamp: string;
 }
+
+export interface ITransactionYDB {
+    id: Buffer;
+    date: Date;
+    expense: BigInt;
+    category: Buffer | null;
+    note: Buffer | null;
+    timestamp: BigInt;
+}

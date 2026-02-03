@@ -6,6 +6,7 @@ import { config } from '@config/environment';
 import { error } from '@logger/index';
 import { botRoutes } from '@server/routes/bot';
 import { expenseRoutes } from '@server/routes/expense';
+import { findRoutes } from '@server/routes/find';
 import { configureHealthRoutes } from '@server/routes/health';
 
 export async function createServer(bot?: Bot | null): Promise<FastifyInstance> {
@@ -24,6 +25,7 @@ export async function createServer(bot?: Bot | null): Promise<FastifyInstance> {
   await fastify.register(healthRoutesWrapped);
   await fastify.register(botRoutes);
   await fastify.register(expenseRoutes);
+  await fastify.register(findRoutes);
 
   return fastify;
 }
