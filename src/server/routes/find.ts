@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+import { findTransactions } from '@core';
 import { ROUTE } from '@server/consts';
-import { handleFind } from '@server/handlers/find';
 import { IFindQueryParams } from '@typings/server/find';
 
 export async function findRoutes(fastify: FastifyInstance): Promise<void> {
@@ -9,6 +9,19 @@ export async function findRoutes(fastify: FastifyInstance): Promise<void> {
     request: FastifyRequest<{ Querystring: IFindQueryParams }>,
     reply: FastifyReply,
   ) => {
-    return handleFind(request, reply);
+    const { date, expense, category, note } = request.query;
+
+    try {
+      const result = await findTransactions({ date, expense, category, note });
+      return reply.status(200).send({
+        status: 'ok',
+        data: result,
+      });
+    } catch (err) {
+      return reply.status(500).send({
+        status: 'error',
+        message: `Internal server error: ${err}`,
+      });
+    }
   });
 }

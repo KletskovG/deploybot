@@ -73,6 +73,7 @@ export default defineConfig({
       '@typings': resolve(__dirname, 'src/typings'),
       '@db': resolve(__dirname, 'src/db'),
       '@lib': resolve(__dirname, 'src/lib'),
+      '@core': resolve(__dirname, 'src/core'),
     },
   },
 });
