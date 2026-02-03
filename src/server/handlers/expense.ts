@@ -3,9 +3,10 @@ import { randomUUID } from 'node:crypto';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { withConnection } from '@db';
+import { readTransactionsFromYDB } from '@db/read';
 import { buildInsertQuery } from '@db/sql/insert';
 import { formatDate, isValidDate } from '@lib';
-import { ITransaction } from '@typings/core/transaction';
+import { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 import { IExpenseQueryParams } from '@typings/server/expense';
 
 export async function handleExpense(
@@ -37,10 +38,11 @@ export async function handleExpense(
     timestamp: new Date().getTime().toString(),
   }];
   const query = buildInsertQuery(transactionsList);
-  return withConnection(async (sql) => await sql(query))
-    .then(() => {
+  return withConnection(async (sql) => await sql<ITransactionYDB[]>(query))
+    .then(([data]) => {
       return reply.status(200).send({
         status: 'ok',
+        data: readTransactionsFromYDB(data),
       });
     })
     .catch(() => {

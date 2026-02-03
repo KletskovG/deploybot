@@ -1,7 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { withConnection } from '@db';
-import { buildFindQuery, readFindResult } from '@db/sql/find';
+import { readTransactionsFromYDB } from '@db/read';
+import { buildFindQuery } from '@db/sql/find';
 import { formatDate, isValidDate } from '@lib';
 import { IFindFiltersOptions } from '@typings/common/findFilters';
 import { ITransactionYDB } from '@typings/core/transaction';
@@ -49,7 +50,7 @@ export async function handleFind(
 
   return withConnection(async (sql) => {
     const [result] = await sql<ITransactionYDB[]>(query);
-    return readFindResult(result);
+    return readTransactionsFromYDB(result);
   })
     .then((result) => {
       return reply.status(200).send({

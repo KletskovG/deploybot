@@ -49,12 +49,13 @@ describe('find transactions in DB', () => {
   let withConnection: typeof import('../index').withConnection;
   let buildInsertQuery: typeof import('../sql/insert').buildInsertQuery;
   let buildFindQuery: typeof import('../sql/find').buildFindQuery;
-  let readFindResult: typeof import('../sql/find').readFindResult;
+  let readTransactionsFromYDB: typeof import('../read').readTransactionsFromYDB;
 
   beforeAll(async () => {
     ({ withConnection } = await import('../index'));
     ({ buildInsertQuery } = await import('../sql/insert'));
-    ({ buildFindQuery, readFindResult } = await import('../sql/find'));
+    ({ buildFindQuery } = await import('../sql/find'));
+    ({ readTransactionsFromYDB } = await import('../read'));
   });
 
   const deleteTestTransactions = async (ids: string[]): Promise<void> => {
@@ -123,7 +124,7 @@ describe('find transactions in DB', () => {
     });
   });
 
-  describe('readFindResult', () => {
+  describe('readTransactionsFromYDB', () => {
     it('transforms YDB result to ITransaction format', () => {
       const mockYdbResult: ITransactionYDB[] = [
         {
@@ -136,7 +137,7 @@ describe('find transactions in DB', () => {
         },
       ];
 
-      const result = readFindResult(mockYdbResult);
+      const result = readTransactionsFromYDB(mockYdbResult);
 
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('test-id-123');
@@ -159,7 +160,7 @@ describe('find transactions in DB', () => {
         },
       ];
 
-      const result = readFindResult(mockYdbResult);
+      const result = readTransactionsFromYDB(mockYdbResult);
 
       expect(result).toHaveLength(1);
       expect(result[0].category).toBeUndefined();
@@ -186,7 +187,7 @@ describe('find transactions in DB', () => {
         },
       ];
 
-      const result = readFindResult(mockYdbResult);
+      const result = readTransactionsFromYDB(mockYdbResult);
 
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe('test-id-1');
@@ -207,8 +208,8 @@ describe('find transactions in DB', () => {
         return rows;
       });
 
-      const transactions = readFindResult(result);
-      const found = transactions.find(t => t.id === transaction.id);
+      const transactions = readTransactionsFromYDB(result);
+      const found = transactions.find((t: ITransaction) => t.id === transaction.id);
 
       expect(found).toBeDefined();
       expect(found?.date).toBe(testDate);
@@ -226,8 +227,8 @@ describe('find transactions in DB', () => {
         return rows;
       });
 
-      const transactions = readFindResult(result);
-      const found = transactions.find(t => t.id === transaction.id);
+      const transactions = readTransactionsFromYDB(result);
+      const found = transactions.find((t: ITransaction) => t.id === transaction.id);
 
       expect(found).toBeDefined();
       expect(found?.expense).toBe(testExpense);
@@ -245,7 +246,7 @@ describe('find transactions in DB', () => {
         return rows;
       });
 
-      const transactions = readFindResult(result);
+      const transactions = readTransactionsFromYDB(result);
 
       expect(transactions).toHaveLength(1);
       expect(transactions[0].id).toBe(transaction.id);
@@ -264,7 +265,7 @@ describe('find transactions in DB', () => {
         return rows;
       });
 
-      const transactions = readFindResult(result);
+      const transactions = readTransactionsFromYDB(result);
 
       expect(transactions).toHaveLength(1);
       expect(transactions[0].id).toBe(transaction.id);
@@ -293,7 +294,7 @@ describe('find transactions in DB', () => {
         return rows;
       });
 
-      const transactions = readFindResult(result);
+      const transactions = readTransactionsFromYDB(result);
 
       expect(transactions).toHaveLength(1);
       expect(transactions[0].id).toBe(transaction.id);
@@ -307,7 +308,7 @@ describe('find transactions in DB', () => {
         return rows;
       });
 
-      const transactions = readFindResult(result);
+      const transactions = readTransactionsFromYDB(result);
 
       expect(transactions).toHaveLength(0);
     });
