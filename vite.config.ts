@@ -8,6 +8,7 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts'],
     testTimeout: 30000,
+    silent: false,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
