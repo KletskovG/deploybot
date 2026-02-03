@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
+import { createExpense } from '@core';
 import { ROUTE } from '@server/consts';
-import { handleExpense } from '@server/handlers/expense';
 import { IExpenseQueryParams } from '@typings/server/expense';
 
 export async function expenseRoutes(fastify: FastifyInstance): Promise<void> {
@@ -9,6 +9,19 @@ export async function expenseRoutes(fastify: FastifyInstance): Promise<void> {
     request: FastifyRequest<{ Querystring: IExpenseQueryParams }>,
     reply: FastifyReply,
   ) => {
-    return handleExpense(request, reply);
+    const { date, expense, category, note } = request.query;
+
+    try {
+      const result = await createExpense({ date, expense, category, note });
+      return reply.status(200).send({
+        status: 'ok',
+        data: result,
+      });
+    } catch (err) {
+      return reply.status(500).send({
+        status: 'error',
+        message: `Internal server error: ${err}`,
+      });
+    }
   });
 }
