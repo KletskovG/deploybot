@@ -2,17 +2,17 @@ import { TABLES } from '@db/consts';
 import { ITransaction } from '@typings/core/transaction';
 
 const transactionList = (transactions: ITransaction[]): string => {
-  return transactions.map(transaction => {
-    const {
-      id,
-      date,
-      expense,
-      category,
-      note,
-      timestamp,
-    } = transaction;
+	return transactions.map(transaction => {
+		const {
+			id,
+			date,
+			expense,
+			category,
+			note,
+			timestamp,
+		} = transaction;
 
-    return `(
+		return `(
     '${id}',
     Date('${date}'),
     ${expense},
@@ -20,12 +20,12 @@ const transactionList = (transactions: ITransaction[]): string => {
     ${note ? `'${note}'` : 'NULL'},
     ${timestamp}
     )`;
-  }).join(',');
+	}).join(',');
 };
 
 export const buildInsertQuery = (transactions: ITransaction[]): string => {
-  const list = transactionList(transactions);
-  return ` 
+	const list = transactionList(transactions);
+	return ` 
     INSERT INTO ${TABLES.transactions} (id, date, expense, category, note, timestamp)
     VALUES ${list}
     RETURNING *;

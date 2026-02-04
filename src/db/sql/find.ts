@@ -2,40 +2,40 @@ import { TABLES } from '@db/consts';
 import { IFindFiltersOptions } from '@typings/common/findFilters';
 
 const findFilters = (filtersOptions: IFindFiltersOptions): string => {
-  const { date, expense, category, note } = filtersOptions;
-  const filters: string[] = [];
+	const { date, expense, category, note } = filtersOptions;
+	const filters: string[] = [];
 
-  if (date) {
-    filters.push(`date = Date('${date}')`);
-  }
+	if (date) {
+		filters.push(`date = Date('${date}')`);
+	}
 
-  if (expense) {
-    filters.push(`expense = ${expense}`);
-  }
+	if (expense) {
+		filters.push(`expense = ${expense}`);
+	}
 
-  if (category) {
-    filters.push(`category = '${category}'`);
-  }
+	if (category) {
+		filters.push(`category = '${category}'`);
+	}
 
-  if (note) {
-    filters.push(`note = '${note}'`);
-  }
+	if (note) {
+		filters.push(`note = '${note}'`);
+	}
 
-  return filters.reduce((acc, filter, index) => {
-    if (index === 0) {
-      return `WHERE ${filter}`;
-    }
-    return `${acc} AND ${filter}`;
-  }, '');
+	return filters.reduce((acc, filter, index) => {
+		if (index === 0) {
+			return `WHERE ${filter}`;
+		}
+		return `${acc} AND ${filter}`;
+	}, '');
 };
 
 export const buildFindQuery = (filtersOptions: IFindFiltersOptions): string => {
-  const filter = findFilters(filtersOptions);
-  const query = `
+	const filter = findFilters(filtersOptions);
+	const query = `
     SELECT * FROM ${TABLES.transactions}
     ${filter}
     ORDER BY date DESC
     LIMIT 100
   `;
-  return query;
+	return query;
 };

@@ -7,26 +7,26 @@ import { BotStatus } from '@typings/bot';
 
 // This will be populated by the bot module
 export const botStatus: BotStatus = {
-  isRunning: false,
-  startTime: null as Date | null,
-  lastUpdate: null as Date | null,
-  messageCount: 0,
-  errorCount: 0,
+	isRunning: false,
+	startTime: null as Date | null,
+	lastUpdate: null as Date | null,
+	messageCount: 0,
+	errorCount: 0,
 };
 
 export function updateBotStatus(status: Partial<typeof botStatus>): void {
-  Object.assign(botStatus, status);
+	Object.assign(botStatus, status);
 }
 
 export async function botRoutes(fastify: FastifyInstance): Promise<void> {
-  fastify.get(ROUTE.BOT_STATUS, async (_request: FastifyRequest, _reply: FastifyReply) => {
-    return {
-      ...botStatus,
-      uptime: botStatus.startTime ? Date.now() - botStatus.startTime.getTime() : 0,
-    };
-  });
+	fastify.get(ROUTE.BOT_STATUS, async (_request: FastifyRequest, _reply: FastifyReply) => {
+		return {
+			...botStatus,
+			uptime: botStatus.startTime ? Date.now() - botStatus.startTime.getTime() : 0,
+		};
+	});
 }
 
 export function getBotStatus(): BotStatus {
-  return botStatus;
+	return botStatus;
 }

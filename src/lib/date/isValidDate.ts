@@ -1,6 +1,6 @@
 export function isValidDate(dateString: string): boolean {
-  const timestamp = Date.parse(dateString);
-  return !isNaN(timestamp);
+	const timestamp = Date.parse(dateString);
+	return !isNaN(timestamp);
 }
 
 // export function isValidISODate(dateString: unknown): boolean {

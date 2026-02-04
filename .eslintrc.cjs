@@ -20,7 +20,7 @@ module.exports = {
   ],
 
   rules: {
-    'indent': ['error', 2, {
+    'indent': ['error', 'tab', {
       'SwitchCase': 1,
       'VariableDeclarator': 1,
       'outerIIFEBody': 1,
@@ -36,7 +36,7 @@ module.exports = {
     'quotes': ['error', 'single', { 'avoidEscape': true }],
     'semi': ['error', 'always'],
     'comma-dangle': ['error', 'always-multiline'],
-    'max-len': ['error', { 'code': 100, 'tabWidth': 2 }],
+    'max-len': ['error', { 'code': 120, 'tabWidth': 4 }],
     'eol-last': ['error', 'always'],
     'no-trailing-spaces': 'error',
     'no-multiple-empty-lines': ['error', { 'max': 1, 'maxEOF': 0, 'maxBOF': 0 }],

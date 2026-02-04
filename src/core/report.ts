@@ -17,61 +17,61 @@ export interface IReportParams {
 const CSV_HEADERS = ['id', 'date', 'expense', 'category', 'note', 'timestamp'] as const;
 
 const escapeCSVValue = (value: string | number | null | undefined): string => {
-  if (value === null || value === undefined) return '';
-  const str = String(value);
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-    return `"${str.replace(/"/g, '""')}"`;
-  }
-  return str;
+	if (value === null || value === undefined) return '';
+	const str = String(value);
+	if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+		return `"${str.replace(/"/g, '""')}"`;
+	}
+	return str;
 };
 
 const transactionsToCSV = (transactions: ITransaction[]): string => {
-  const header = CSV_HEADERS.join(',');
-  const rows = transactions.map(t =>
-    CSV_HEADERS.map(key => escapeCSVValue(t[key])).join(','),
-  );
-  return [header, ...rows].join('\n');
+	const header = CSV_HEADERS.join(',');
+	const rows = transactions.map(t =>
+		CSV_HEADERS.map(key => escapeCSVValue(t[key])).join(','),
+	);
+	return [header, ...rows].join('\n');
 };
 
 export async function getReport(
-  params: IReportParams,
+	params: IReportParams,
 ): Promise<string> {
-  const { dateFrom, dateTo } = params;
+	const { dateFrom, dateTo } = params;
 
-  if (!isValidDate(dateFrom)) {
-    throw new ValidationError('Invalid dateFrom');
-  }
+	if (!isValidDate(dateFrom)) {
+		throw new ValidationError('Invalid dateFrom');
+	}
 
-  if (!isValidDate(dateTo)) {
-    throw new ValidationError('Invalid dateTo');
-  }
+	if (!isValidDate(dateTo)) {
+		throw new ValidationError('Invalid dateTo');
+	}
 
-  const formattedDateFrom = formatDate(new Date(dateFrom));
-  const formattedDateTo = formatDate(new Date(dateTo));
+	const formattedDateFrom = formatDate(new Date(dateFrom));
+	const formattedDateTo = formatDate(new Date(dateTo));
 
-  const filters = {
-    dateFrom: formattedDateFrom,
-    dateTo: formattedDateTo,
-  };
+	const filters = {
+		dateFrom: formattedDateFrom,
+		dateTo: formattedDateTo,
+	};
 
-  const query = buildReportQuery(filters);
+	const query = buildReportQuery(filters);
 
-  try {
-    const transactions = await withConnection(async (sql) => {
-      const [data] = await sql<ITransactionYDB[]>(query);
-      return readTransactionsFromYDB(data);
-    });
+	try {
+		const transactions = await withConnection(async (sql) => {
+			const [data] = await sql<ITransactionYDB[]>(query);
+			return readTransactionsFromYDB(data);
+		});
 
-    const csv = transactionsToCSV(transactions);
-    const filename = `report_${formattedDateFrom}_${formattedDateTo}.csv`;
-    const csvPath = join(process.cwd(), filename);
+		const csv = transactionsToCSV(transactions);
+		const filename = `report_${formattedDateFrom}_${formattedDateTo}.csv`;
+		const csvPath = join(process.cwd(), filename);
 
-    await writeFile(csvPath, csv, 'utf-8');
+		await writeFile(csvPath, csv, 'utf-8');
 
-    return csvPath;
-  } catch (err) {
-    error('Error getting report: ', err);
-  }
+		return csvPath;
+	} catch (err) {
+		error('Error getting report: ', err);
+	}
 
-  return '';
+	return '';
 }

@@ -8,45 +8,45 @@ import { IFindFiltersOptions } from '@typings/common/findFilters';
 import { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
 export async function findTransactions(
-  params: IFindFiltersOptions,
+	params: IFindFiltersOptions,
 ): Promise<ITransaction[]> {
-  const { date, expense, category, note } = params;
+	const { date, expense, category, note } = params;
 
-  if (date && !isValidDate(date)) {
-    throw new ValidationError('Invalid date');
-  }
+	if (date && !isValidDate(date)) {
+		throw new ValidationError('Invalid date');
+	}
 
-  if (expense && isNaN(Number(expense))) {
-    throw new ValidationError('Invalid expense value');
-  }
+	if (expense && isNaN(Number(expense))) {
+		throw new ValidationError('Invalid expense value');
+	}
 
-  const filters: IFindFiltersOptions = {};
+	const filters: IFindFiltersOptions = {};
 
-  if (date) {
-    filters.date = formatDate(new Date(date));
-  }
+	if (date) {
+		filters.date = formatDate(new Date(date));
+	}
 
-  if (expense) {
-    filters.expense = Number(expense);
-  }
+	if (expense) {
+		filters.expense = Number(expense);
+	}
 
-  if (category) {
-    filters.category = String(category);
-  }
+	if (category) {
+		filters.category = String(category);
+	}
 
-  if (note) {
-    filters.note = String(note);
-  }
+	if (note) {
+		filters.note = String(note);
+	}
 
-  const query = buildFindQuery(filters);
+	const query = buildFindQuery(filters);
 
-  try {
-    return await withConnection(async (sql) => {
-      const [data] = await sql<ITransactionYDB[]>(query);
-      return readTransactionsFromYDB(data);
-    });
-  } catch (err) {
-    error('Error finding transactions: ', err);
-  }
-  return [];
+	try {
+		return await withConnection(async (sql) => {
+			const [data] = await sql<ITransactionYDB[]>(query);
+			return readTransactionsFromYDB(data);
+		});
+	} catch (err) {
+		error('Error finding transactions: ', err);
+	}
+	return [];
 }
