@@ -10,34 +10,34 @@ import { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 import { IExpenseQueryParams } from '@typings/server/expense';
 
 export async function createExpense(
-  params: IExpenseQueryParams,
+	params: IExpenseQueryParams,
 ): Promise<ITransaction[]> {
-  const { date, expense, category, note } = params;
+	const { date, expense, category, note } = params;
 
-  if (!isValidDate(date)) {
-    throw new ValidationError('Invalid date');
-  }
+	if (!isValidDate(date)) {
+		throw new ValidationError('Invalid date');
+	}
 
-  if (!expense) {
-    throw new ValidationError('Missing expense');
-  }
+	if (!expense) {
+		throw new ValidationError('Missing expense');
+	}
 
-  const transactionsList: ITransaction[] = [{
-    id: randomUUID(),
-    date: formatDate(new Date(date)),
-    expense: Number(expense),
-    category: String(category).toLowerCase().trim() ?? null,
-    note: String(note).toLowerCase().trim() ?? null,
-    timestamp: new Date().getTime().toString(),
-  }];
+	const transactionsList: ITransaction[] = [{
+		id: randomUUID(),
+		date: formatDate(new Date(date)),
+		expense: Number(expense),
+		category: String(category).toLowerCase().trim() ?? null,
+		note: String(note).toLowerCase().trim() ?? null,
+		timestamp: new Date().getTime().toString(),
+	}];
 
-  const query = buildInsertQuery(transactionsList);
+	const query = buildInsertQuery(transactionsList);
 
-  try {
-    const [data] = await withConnection(async (sql) => await sql<ITransactionYDB[]>(query));
-    return readTransactionsFromYDB(data);
-  } catch (err) {
-    error('Error creating expense: ', err);
-    return [];
-  }
+	try {
+		const [data] = await withConnection(async (sql) => await sql<ITransactionYDB[]>(query));
+		return readTransactionsFromYDB(data);
+	} catch (err) {
+		error('Error creating expense: ', err);
+		return [];
+	}
 }
