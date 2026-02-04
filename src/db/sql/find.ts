@@ -34,6 +34,7 @@ export const buildFindQuery = (filtersOptions: IFindFiltersOptions): string => {
   const query = `
     SELECT * FROM ${TABLES.transactions}
     ${filter}
+    ORDER BY date DESC
     LIMIT 100
   `;
   return query;

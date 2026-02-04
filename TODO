@@ -2,7 +2,9 @@
 - prod and dev environments for DB 
 - Rich testing of DB and server handlers - also in CI
 - Script for nginx config release
-- Create NGINX basic routes - /bot and /budget
-- Update eslint, remove this - if (!value) return defaultValue; 
 - Read about YDB migrations
-- Refactor routes and handler. Handler have to contain ONLY business logic, no http stuff
+- Make transactions editable from UI
+- Add button for collecting report from UI
+
+
+Finished while building report module - need to check all code which agent write to me
