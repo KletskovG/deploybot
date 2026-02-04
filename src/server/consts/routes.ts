@@ -3,4 +3,5 @@ export enum ROUTE {
   BOT_STATUS = '/bot/status',
   EXPENSE = '/expense',
   FIND = '/find',
+  REPORT = '/report',
 }
