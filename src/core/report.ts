@@ -1,10 +1,11 @@
-import { writeFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { withConnection } from '@db';
 import { readTransactionsFromYDB } from '@db/read';
 import { buildReportQuery } from '@db/sql/report';
-import { formatDate, isValidDate } from '@lib';
+import { formatDate, isValidDate, uploadToS3 } from '@lib';
 import { ValidationError } from '@lib/error';
 import { error } from '@logger';
 import { ITransaction, ITransactionYDB } from '@typings/core/transaction';
@@ -63,12 +64,19 @@ export async function getReport(
 		});
 
 		const csv = transactionsToCSV(transactions);
-		const filename = `report_${formattedDateFrom}_${formattedDateTo}.csv`;
+		const filename = `${randomUUID()}.csv`;
 		const csvPath = join(process.cwd(), filename);
 
 		await writeFile(csvPath, csv, 'utf-8');
 
-		return csvPath;
+		return uploadToS3(csvPath)
+			.then(s3Url => {
+				if (s3Url) {
+					rm(csvPath);
+				}
+
+				return csvPath;
+			});
 	} catch (err) {
 		error('Error getting report: ', err);
 	}

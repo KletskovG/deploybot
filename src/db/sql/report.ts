@@ -11,6 +11,6 @@ export const buildReportQuery = (filters: IReportFilters): string => {
 	return `
     SELECT * FROM ${TABLES.transactions}
     WHERE date >= Date('${dateFrom}') AND date <= Date('${dateTo}')
-    ORDER BY date ASC
+    ORDER BY date DESC
   `;
 };
