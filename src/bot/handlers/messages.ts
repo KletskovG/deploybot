@@ -1,5 +1,7 @@
 import { Context } from 'grammy';
 
+import { getReport } from '@core';
+
 export async function handleTextMessage(ctx: Context): Promise<void> {
 	const text = ctx.message?.text;
 
@@ -9,6 +11,12 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
 
 	if (text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi')) {
 		await ctx.reply('Hello! 👋 Use /help to see available commands.');
+		return;
+	}
+
+	if (text.toLowerCase().includes('report')) {
+		const report = await getReport({ dateFrom: '2026-02-01', dateTo: '2026-02-28' });
+		await ctx.reply(report);
 		return;
 	}
 

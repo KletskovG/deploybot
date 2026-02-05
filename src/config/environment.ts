@@ -7,6 +7,8 @@ export interface Environment {
   CHAT_ID: number;
   YDB_CONNECTION_STRING: string;
   YDB_KEY_PATH: string;
+  S3_TOKEN: string;
+  S3_BUCKET_URL: string;
 }
 
 function getEnvVar(key: string, required = true): string {
@@ -45,4 +47,6 @@ export const config: Environment = {
 	CHAT_ID: getEnvNumber('CHAT_ID'),
 	YDB_CONNECTION_STRING: getEnvVar('YDB_CONNECTION_STRING'),
 	YDB_KEY_PATH: getEnvVar('YDB_KEY_PATH'),
+	S3_TOKEN: getEnvVar('S3_TOKEN'),
+	S3_BUCKET_URL: getEnvVar('S3_BUCKET_URL'),
 };
