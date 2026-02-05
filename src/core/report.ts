@@ -26,7 +26,7 @@ const escapeCSVValue = (value: string | number | null | undefined): string => {
 	return str;
 };
 
-const transactionsToCSV = (transactions: ITransaction[]): string => {
+const transactionsToCSV = (transactions: Array<Partial<ITransaction>>): string => {
 	const header = CSV_HEADERS.join(',');
 	const rows = transactions.map(t =>
 		CSV_HEADERS.map(key => escapeCSVValue(t[key])).join(','),
@@ -60,7 +60,11 @@ export async function getReport(
 	try {
 		const transactions = await withConnection(async (sql) => {
 			const [data] = await sql<ITransactionYDB[]>(query);
-			return readTransactionsFromYDB(data);
+			return readTransactionsFromYDB(data).map(transaction => {
+				const transactionCopy: Partial<ITransaction> = { ...transaction };
+				delete transactionCopy.id;
+				return transactionCopy;
+			});
 		});
 
 		const csv = transactionsToCSV(transactions);
