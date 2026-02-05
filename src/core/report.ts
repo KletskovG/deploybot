@@ -73,6 +73,7 @@ export async function getReport(
 			.then(s3Url => {
 				if (s3Url) {
 					rm(csvPath);
+					return s3Url;
 				}
 
 				return csvPath;
