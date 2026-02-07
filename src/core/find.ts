@@ -1,6 +1,6 @@
 import { withConnection } from '@db';
 import { readTransactionsFromYDB } from '@db/read';
-import { buildFindQuery } from '@db/sql/find';
+import { buildFindQuery } from '@db/yql/find';
 import { formatDate, isValidDate } from '@lib';
 import { ValidationError } from '@lib/error';
 import { error } from '@logger';

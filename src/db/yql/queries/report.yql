@@ -1,0 +1,3 @@
+SELECT * FROM ${table}
+WHERE date >= Date('${dateFrom}') AND date <= Date('${dateTo}')
+ORDER BY date DESC

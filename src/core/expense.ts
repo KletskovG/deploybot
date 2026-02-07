@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import { withConnection } from '@db';
 import { readTransactionsFromYDB } from '@db/read';
-import { buildInsertQuery } from '@db/sql/insert';
+import { buildInsertQuery } from '@db/yql/insert';
 import { formatDate, isValidDate } from '@lib';
 import { ValidationError } from '@lib/error';
 import { error } from '@logger';

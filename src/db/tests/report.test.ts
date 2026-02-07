@@ -47,14 +47,14 @@ describe('report transactions from DB', () => {
 	const insertedIds: string[] = [];
 
 	let withConnection: typeof import('../index').withConnection;
-	let buildInsertQuery: typeof import('../sql/insert').buildInsertQuery;
-	let buildReportQuery: typeof import('../sql/report').buildReportQuery;
+	let buildInsertQuery: typeof import('../yql/insert').buildInsertQuery;
+	let buildReportQuery: typeof import('../yql/report').buildReportQuery;
 	let readTransactionsFromYDB: typeof import('../read').readTransactionsFromYDB;
 
 	beforeAll(async () => {
 		({ withConnection } = await import('../index'));
-		({ buildInsertQuery } = await import('../sql/insert'));
-		({ buildReportQuery } = await import('../sql/report'));
+		({ buildInsertQuery } = await import('../yql/insert'));
+		({ buildReportQuery } = await import('../yql/report'));
 		({ readTransactionsFromYDB } = await import('../read'));
 	});
 
