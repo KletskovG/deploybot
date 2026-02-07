@@ -26,7 +26,7 @@ vi.mock('@db/read', () => ({
 	readTransactionsFromYDB: vi.fn(),
 }));
 
-vi.mock('@db/sql/find', () => ({
+vi.mock('@db/yql/find', () => ({
 	buildFindQuery: vi.fn(),
 }));
 
@@ -40,7 +40,7 @@ describe('findTransactions', () => {
 
 		const dbModule = await import('@db');
 		const readModule = await import('@db/read');
-		const sqlModule = await import('@db/sql/find');
+		const sqlModule = await import('@db/yql/find');
 
 		mockWithConnection = dbModule.withConnection as ReturnType<typeof vi.fn>;
 		mockReadTransactionsFromYDB = readModule.readTransactionsFromYDB as ReturnType<typeof vi.fn>;

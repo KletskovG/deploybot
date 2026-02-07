@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { withConnection } from '@db';
 import { readTransactionsFromYDB } from '@db/read';
-import { buildReportQuery } from '@db/sql/report';
+import { buildReportQuery } from '@db/yql/report';
 import { formatDate, isValidDate, uploadToS3 } from '@lib';
 import { ValidationError } from '@lib/error';
 import { error } from '@logger';

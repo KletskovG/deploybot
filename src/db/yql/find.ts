@@ -1,6 +1,8 @@
 import { TABLES } from '@db/consts';
 import { IFindFiltersOptions } from '@typings/common/findFilters';
 
+import { queries } from './queries';
+
 const findFilters = (filtersOptions: IFindFiltersOptions): string => {
 	const { date, expense, category, note } = filtersOptions;
 	const filters: string[] = [];
@@ -31,11 +33,5 @@ const findFilters = (filtersOptions: IFindFiltersOptions): string => {
 
 export const buildFindQuery = (filtersOptions: IFindFiltersOptions): string => {
 	const filter = findFilters(filtersOptions);
-	const query = `
-    SELECT * FROM ${TABLES.transactions}
-    ${filter}
-    ORDER BY date DESC
-    LIMIT 100
-  `;
-	return query;
+	return queries.find(TABLES.transactions, filter);
 };

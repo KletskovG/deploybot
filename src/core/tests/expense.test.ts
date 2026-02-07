@@ -26,7 +26,7 @@ vi.mock('@db/read', () => ({
 	readTransactionsFromYDB: vi.fn(),
 }));
 
-vi.mock('@db/sql/insert', () => ({
+vi.mock('@db/yql/insert', () => ({
 	buildInsertQuery: vi.fn(),
 }));
 
@@ -40,7 +40,7 @@ describe('createExpense', () => {
 
 		const dbModule = await import('@db');
 		const readModule = await import('@db/read');
-		const sqlModule = await import('@db/sql/insert');
+		const sqlModule = await import('@db/yql/insert');
 
 		mockWithConnection = dbModule.withConnection as ReturnType<typeof vi.fn>;
 		mockReadTransactionsFromYDB = readModule.readTransactionsFromYDB as ReturnType<typeof vi.fn>;

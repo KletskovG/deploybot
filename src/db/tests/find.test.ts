@@ -47,14 +47,14 @@ describe('find transactions in DB', () => {
 	const insertedIds: string[] = [];
 
 	let withConnection: typeof import('../index').withConnection;
-	let buildInsertQuery: typeof import('../sql/insert').buildInsertQuery;
-	let buildFindQuery: typeof import('../sql/find').buildFindQuery;
+	let buildInsertQuery: typeof import('../yql/insert').buildInsertQuery;
+	let buildFindQuery: typeof import('../yql/find').buildFindQuery;
 	let readTransactionsFromYDB: typeof import('../read').readTransactionsFromYDB;
 
 	beforeAll(async () => {
 		({ withConnection } = await import('../index'));
-		({ buildInsertQuery } = await import('../sql/insert'));
-		({ buildFindQuery } = await import('../sql/find'));
+		({ buildInsertQuery } = await import('../yql/insert'));
+		({ buildFindQuery } = await import('../yql/find'));
 		({ readTransactionsFromYDB } = await import('../read'));
 	});
 

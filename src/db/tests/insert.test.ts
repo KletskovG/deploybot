@@ -51,11 +51,11 @@ describe('insert transactions to DB', () => {
 	const insertedIds: string[] = [];
 
 	let withConnection: typeof import('../index').withConnection;
-	let buildInsertQuery: typeof import('../sql/insert').buildInsertQuery;
+	let buildInsertQuery: typeof import('../yql/insert').buildInsertQuery;
 
 	beforeAll(async () => {
 		({ withConnection } = await import('../index'));
-		({ buildInsertQuery } = await import('../sql/insert'));
+		({ buildInsertQuery } = await import('../yql/insert'));
 	});
 
 	const deleteTestTransactions = async (ids: string[]): Promise<void> => {

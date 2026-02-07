@@ -1,6 +1,8 @@
 import { TABLES } from '@db/consts';
 import { ITransaction } from '@typings/core/transaction';
 
+import { queries } from './queries';
+
 const transactionList = (transactions: ITransaction[]): string => {
 	return transactions.map(transaction => {
 		const {
@@ -25,9 +27,5 @@ const transactionList = (transactions: ITransaction[]): string => {
 
 export const buildInsertQuery = (transactions: ITransaction[]): string => {
 	const list = transactionList(transactions);
-	return ` 
-    INSERT INTO ${TABLES.transactions} (id, date, expense, category, note, timestamp)
-    VALUES ${list}
-    RETURNING *;
-  `;
+	return queries.insert(TABLES.transactions, list);
 };

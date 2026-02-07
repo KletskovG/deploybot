@@ -27,7 +27,7 @@ vi.mock('@db/read', () => ({
 	readTransactionsFromYDB: vi.fn(),
 }));
 
-vi.mock('@db/sql/report', () => ({
+vi.mock('@db/yql/report', () => ({
 	buildReportQuery: vi.fn(),
 }));
 
@@ -57,7 +57,7 @@ describe('getReport', () => {
 
 		const dbModule = await import('@db');
 		const readModule = await import('@db/read');
-		const sqlModule = await import('@db/sql/report');
+		const sqlModule = await import('@db/yql/report');
 		const fsModule = await import('node:fs/promises');
 		const libModule = await import('@lib');
 
