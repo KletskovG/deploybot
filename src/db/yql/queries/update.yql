@@ -1,0 +1,4 @@
+UPDATE ${table}
+SET ${fields}
+WHERE id = '${id}'
+RETURNING *;
