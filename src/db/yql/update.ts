@@ -16,11 +16,11 @@ const buildSetFields = (fields: UpdatableFields): string => {
 		parts.push(`expense = ${fields.expense}`);
 	}
 
-	if (fields.category) {
+	if (fields.category !== undefined) {
 		parts.push(`category = ${fields.category ? `'${fields.category}'` : 'NULL'}`);
 	}
 
-	if (fields.note) {
+	if (fields.note !== undefined) {
 		parts.push(`note = ${fields.note ? `'${fields.note}'` : 'NULL'}`);
 	}
 

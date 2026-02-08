@@ -1,0 +1,331 @@
+openapi: 3.0.3
+info:
+  title: DeployBot API
+  description: Personal expense tracker HTTP API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:{port}
+    variables:
+      port:
+        default: "3000"
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Returns server health status. Optionally pings Telegram bot if connected.
+      operationId: getHealth
+      responses:
+        "200":
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, timestamp, uptime]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2026-02-08T12:00:00.000Z"
+                  uptime:
+                    type: number
+                    description: Process uptime in seconds
+                    example: 3600
+
+  /bot/status:
+    get:
+      summary: Bot status
+      description: Returns current Telegram bot runtime status.
+      operationId: getBotStatus
+      responses:
+        "200":
+          description: Bot status info
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [isRunning, startTime, lastUpdate, messageCount, errorCount, uptime]
+                properties:
+                  isRunning:
+                    type: boolean
+                  startTime:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  lastUpdate:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  messageCount:
+                    type: integer
+                  errorCount:
+                    type: integer
+                  uptime:
+                    type: integer
+                    description: Uptime in milliseconds (0 if not started)
+
+  /expense:
+    get:
+      summary: Create expense
+      description: Creates a new expense transaction.
+      operationId: createExpense
+      parameters:
+        - name: date
+          in: query
+          required: true
+          description: Transaction date (ISO 8601)
+          schema:
+            type: string
+            example: "2026-02-08"
+        - name: expense
+          in: query
+          required: true
+          description: Expense amount
+          schema:
+            type: string
+            example: "500"
+        - name: category
+          in: query
+          required: false
+          description: Expense category
+          schema:
+            type: string
+            example: food
+        - name: note
+          in: query
+          required: false
+          description: Free-text note
+          schema:
+            type: string
+            example: groceries
+      responses:
+        "200":
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionListResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /find:
+    get:
+      summary: Find transactions
+      description: Searches transactions by optional filters. All parameters are optional; omitting all returns all records.
+      operationId: findTransactions
+      parameters:
+        - name: date
+          in: query
+          required: false
+          description: Filter by date (ISO 8601)
+          schema:
+            type: string
+            example: "2026-02-08"
+        - name: expense
+          in: query
+          required: false
+          description: Filter by exact expense amount
+          schema:
+            type: number
+            example: 500
+        - name: category
+          in: query
+          required: false
+          description: Filter by category
+          schema:
+            type: string
+            example: food
+        - name: note
+          in: query
+          required: false
+          description: Filter by note text
+          schema:
+            type: string
+            example: groceries
+      responses:
+        "200":
+          description: Matching transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionListResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /report:
+    get:
+      summary: Generate CSV report
+      description: Generates a CSV report for the given date range, uploads it to S3 and returns the URL.
+      operationId: getReport
+      parameters:
+        - name: dateFrom
+          in: query
+          required: true
+          description: Report start date (ISO 8601)
+          schema:
+            type: string
+            example: "2026-02-01"
+        - name: dateTo
+          in: query
+          required: true
+          description: Report end date (ISO 8601)
+          schema:
+            type: string
+            example: "2026-02-28"
+      responses:
+        "200":
+          description: Report generated
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  data:
+                    type: object
+                    required: [csvPath]
+                    properties:
+                      csvPath:
+                        type: string
+                        description: S3 URL or local file path to the CSV
+                        example: https://s3.example.com/report-abc.csv
+        "500":
+          description: Server error or report generation failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /update:
+    get:
+      summary: Update transaction
+      description: Updates an existing transaction by id. At least one field besides id must be provided.
+      operationId: updateTransaction
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Transaction UUID
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440000"
+        - name: date
+          in: query
+          required: false
+          description: New date (ISO 8601)
+          schema:
+            type: string
+            example: "2026-02-08"
+        - name: expense
+          in: query
+          required: false
+          description: New expense amount
+          schema:
+            type: number
+            example: 750
+        - name: category
+          in: query
+          required: false
+          description: New category
+          schema:
+            type: string
+            nullable: true
+            example: transport
+        - name: note
+          in: query
+          required: false
+          description: New note
+          schema:
+            type: string
+            nullable: true
+            example: taxi
+        - name: timestamp
+          in: query
+          required: true
+          description: Transaction timestamp (epoch ms as string)
+          schema:
+            type: string
+            example: "1738713600000"
+      responses:
+        "200":
+          description: Transaction updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionListResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    Transaction:
+      type: object
+      required: [id, date, expense, timestamp]
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        date:
+          type: string
+          description: Date in YYYY-MM-DD format
+          example: "2026-02-08"
+        expense:
+          type: number
+          example: 500
+        category:
+          type: string
+          nullable: true
+          example: food
+        note:
+          type: string
+          nullable: true
+          example: groceries
+        timestamp:
+          type: string
+          description: Epoch milliseconds as string
+          example: "1738713600000"
+
+    TransactionListResponse:
+      type: object
+      required: [status, data]
+      properties:
+        status:
+          type: string
+          example: ok
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+
+    ErrorResponse:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: "Internal server error: ..."

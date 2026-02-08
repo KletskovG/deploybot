@@ -33,11 +33,11 @@ export async function updateTransaction(
 		fields.expense = Number(expense);
 	}
 
-	if (category) {
+	if (category !== undefined) {
 		fields.category = category ? String(category).toLowerCase().trim() : null;
 	}
 
-	if (note) {
+	if (note !== undefined) {
 		fields.note = note ? String(note).toLowerCase().trim() : null;
 	}
 

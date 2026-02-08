@@ -5,4 +5,5 @@ export enum ROUTE {
   FIND = '/find',
   REPORT = '/report',
   UPDATE = '/update',
+  OPENAPI = '/openapi',
 }
