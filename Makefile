@@ -34,6 +34,10 @@ docker-pull:
 
 docker-deploy: docker-pull docker-up
 
+nginx-deploy:
+	cp ./.config/nginx/deploybot.conf /etc/nginx/sites-available/deploybot.conf
+	sudo systemctl restart nginx
+
 # Development
 docker-build-dev:
 	docker build -t localhot/deploybot:latest -f deployment/docker/Dockerfile.dev .
@@ -54,26 +58,5 @@ docker-deploy-dev: docker-build-dev docker-up-dev
 
 docker-clean:
 	docker image prune
-
-# TODO: Delete
-docker-login:
-	@echo "Login to GitHub Container Registry"
-	@read -p "GitHub Username: " username; \
-	read -sp "GitHub Token (PAT): " token; \
-	echo ""; \
-	echo $$token | docker login ghcr.io -u $$username --password-stdin
-
-docker-install-service:
-	sudo cp deployment/docker/deploybot.service /etc/systemd/system/
-	sudo systemctl daemon-reload
-	sudo systemctl enable deploybot.service
-	sudo systemctl start deploybot.service
-	sudo systemctl status deploybot.service
-
-docker-uninstall-service:
-	sudo systemctl stop deploybot.service
-	sudo systemctl disable deploybot.service
-	sudo rm /etc/systemd/system/deploybot.service
-	sudo systemctl daemon-reload
 
 .DEFAULT_GOAL := dev
