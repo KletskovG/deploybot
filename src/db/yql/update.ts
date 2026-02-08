@@ -8,19 +8,19 @@ type UpdatableFields = Partial<Pick<ITransaction, 'date' | 'expense' | 'category
 const buildSetFields = (fields: UpdatableFields): string => {
 	const parts: string[] = [];
 
-	if (fields.date !== undefined) {
+	if (fields.date) {
 		parts.push(`date = Date('${fields.date}')`);
 	}
 
-	if (fields.expense !== undefined) {
+	if (fields.expense) {
 		parts.push(`expense = ${fields.expense}`);
 	}
 
-	if (fields.category !== undefined) {
+	if (fields.category) {
 		parts.push(`category = ${fields.category ? `'${fields.category}'` : 'NULL'}`);
 	}
 
-	if (fields.note !== undefined) {
+	if (fields.note) {
 		parts.push(`note = ${fields.note ? `'${fields.note}'` : 'NULL'}`);
 	}
 

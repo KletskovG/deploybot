@@ -15,7 +15,7 @@ export async function updateTransaction(
 		throw new ValidationError('Update: Missing transaction id');
 	}
 
-	if (date !== undefined && !isValidDate(date)) {
+	if (date && !isValidDate(date)) {
 		throw new ValidationError('Update: Invalid date');
 	}
 
@@ -25,19 +25,19 @@ export async function updateTransaction(
 
 	const fields: Partial<ITransaction> = {};
 
-	if (date !== undefined) {
+	if (date) {
 		fields.date = formatDate(new Date(date));
 	}
 
-	if (expense !== undefined) {
+	if (expense) {
 		fields.expense = Number(expense);
 	}
 
-	if (category !== undefined) {
+	if (category) {
 		fields.category = category ? String(category).toLowerCase().trim() : null;
 	}
 
-	if (note !== undefined) {
+	if (note) {
 		fields.note = note ? String(note).toLowerCase().trim() : null;
 	}
 
