@@ -8,6 +8,7 @@ import { botRoutes } from '@server/routes/bot';
 import { expenseRoutes } from '@server/routes/expense';
 import { findRoutes } from '@server/routes/find';
 import { configureHealthRoutes } from '@server/routes/health';
+import { openapiRoutes } from '@server/routes/openapi';
 import { reportRoutes } from '@server/routes/report';
 import { updateRoutes } from '@server/routes/update';
 
@@ -30,6 +31,7 @@ export async function createServer(bot?: Bot | null): Promise<FastifyInstance> {
 	await fastify.register(findRoutes);
 	await fastify.register(reportRoutes);
 	await fastify.register(updateRoutes);
+	await fastify.register(openapiRoutes);
 
 	return fastify;
 }
