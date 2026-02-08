@@ -2,6 +2,7 @@ A MUST RULES
 - Keep docs brief and techinical (NO EMOJI)
 - DONT create and Bash scripts or md files without certain requirement. Create files of these types only if user asked about it
 - Dont write JSDoc - we dont use it.
+- After changing server directory - update server/openapi.yaml to make it actual to code
 
 # Product
 

@@ -1,4 +1,5 @@
 import { formatDate } from '@lib';
+import { ICategoryYDB } from '@typings/core/category';
 import { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
 export const readTransactionsFromYDB = (result: ITransactionYDB[]): ITransaction[] => {
@@ -12,4 +13,8 @@ export const readTransactionsFromYDB = (result: ITransactionYDB[]): ITransaction
 			timestamp: item.timestamp.toString(),
 		};
 	});
+};
+
+export const readCategoriesFromYDB = (result: ICategoryYDB[]): string[] => {
+	return result.map(item => item.category.toString());
 };

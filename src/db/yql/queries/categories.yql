@@ -1,0 +1,3 @@
+SELECT DISTINCT category FROM ${table}
+WHERE category IS NOT NULL
+ORDER BY category
