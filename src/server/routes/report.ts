@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { getReport } from '@core';
-import { ROUTE } from '@server/consts';
+import { HTTP_STATUS, ROUTE } from '@server/consts';
 
 export interface IReportQueryParams {
   dateFrom: string;
@@ -19,18 +19,18 @@ export async function reportRoutes(fastify: FastifyInstance): Promise<void> {
 			const csvPath = await getReport({ dateFrom, dateTo });
 
 			if (csvPath) {
-				return reply.status(200).send({
+				return reply.status(HTTP_STATUS.OK).send({
 					status: 'ok',
 					data: { csvPath },
 				});
 			}
 
-			return reply.status(500).send({
+			return reply.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({
 				status: 'error',
 				message: 'Failed to generate report',
 			});
 		} catch (err) {
-			return reply.status(500).send({
+			return reply.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).send({
 				status: 'error',
 				message: `Internal server error: ${err}`,
 			});

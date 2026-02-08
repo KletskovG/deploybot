@@ -1,13 +1,10 @@
-import { randomUUID } from 'node:crypto';
-
 import { describe, it, expect, afterAll, vi, beforeAll } from 'vitest';
 
 import { TABLES } from '@db/consts';
-import { getRandomDate, getRandomItem } from '@lib/utils/random';
 import { info } from '@logger';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
-import { categories, expenses, notes } from './mocks';
+import { createTestTransaction } from './mocks';
 
 const TEST_PREFIX = 'test-find-';
 
@@ -32,16 +29,6 @@ vi.mock('@db/consts', () => ({
 		transactions: 'transactions_dev',
 	},
 }));
-
-const createTestTransaction = (overrides: Partial<ITransaction> = {}): ITransaction => ({
-	id: `${TEST_PREFIX}${randomUUID()}`,
-	date: getRandomDate('2026-02-03', '2026-02-04'),
-	expense: getRandomItem(expenses),
-	category: getRandomItem(categories),
-	note: getRandomItem(notes),
-	timestamp: Date.now().toString(),
-	...overrides,
-});
 
 describe('find transactions in DB', () => {
 	const insertedIds: string[] = [];
@@ -198,7 +185,7 @@ describe('find transactions in DB', () => {
 	describe('find query execution', () => {
 		it('finds transaction by date', async () => {
 			const testDate = '2026-02-03';
-			const transaction = createTestTransaction({ date: testDate });
+			const transaction = createTestTransaction(TEST_PREFIX, { date: testDate });
 			await insertTransaction(transaction);
 
 			const query = buildFindQuery({ date: testDate });
@@ -217,7 +204,7 @@ describe('find transactions in DB', () => {
 
 		it('finds transaction by expense amount', async () => {
 			const testExpense = 99999;
-			const transaction = createTestTransaction({ expense: testExpense });
+			const transaction = createTestTransaction(TEST_PREFIX, { expense: testExpense });
 			await insertTransaction(transaction);
 
 			const query = buildFindQuery({ expense: testExpense });
@@ -236,7 +223,7 @@ describe('find transactions in DB', () => {
 
 		it('finds transaction by category', async () => {
 			const testCategory = 'test-category-unique';
-			const transaction = createTestTransaction({ category: testCategory });
+			const transaction = createTestTransaction(TEST_PREFIX, { category: testCategory });
 			await insertTransaction(transaction);
 
 			const query = buildFindQuery({ category: testCategory });
@@ -255,7 +242,7 @@ describe('find transactions in DB', () => {
 
 		it('finds transaction by note', async () => {
 			const testNote = 'test-note-unique';
-			const transaction = createTestTransaction({ note: testNote });
+			const transaction = createTestTransaction(TEST_PREFIX, { note: testNote });
 			await insertTransaction(transaction);
 
 			const query = buildFindQuery({ note: testNote });
@@ -276,7 +263,7 @@ describe('find transactions in DB', () => {
 			const testDate = '2026-02-03';
 			const testExpense = 88888;
 			const testCategory = 'multi-filter-category';
-			const transaction = createTestTransaction({
+			const transaction = createTestTransaction(TEST_PREFIX, {
 				date: testDate,
 				expense: testExpense,
 				category: testCategory,

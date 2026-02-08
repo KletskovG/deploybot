@@ -1,3 +1,8 @@
+import { randomUUID } from 'node:crypto';
+
+import { getRandomDate, getRandomItem } from '@lib/utils/random';
+import type { ITransaction } from '@typings/core/transaction';
+
 export const expenses: number[] = [
 	150,
 	250,
@@ -36,3 +41,13 @@ export const categories: string[] = [
 	'services',
 	'repairs',
 ];
+
+export const createTestTransaction = (prefix: string, overrides: Partial<ITransaction> = {}): ITransaction => ({
+	id: `${prefix}${randomUUID()}`,
+	date: getRandomDate('2026-02-03', '2026-02-04'),
+	expense: getRandomItem(expenses),
+	category: getRandomItem(categories),
+	note: getRandomItem(notes),
+	timestamp: Date.now().toString(),
+	...overrides,
+});

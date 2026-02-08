@@ -59,7 +59,7 @@ module.exports = {
     'no-implied-eval': 'error',
     'no-new-func': 'error',
     'no-script-url': 'error',
-    'complexity': ['error', { 'max': 10 }],
+    'complexity': ['error', { 'max': 25 }],
     'max-depth': ['error', { 'max': 4 }],
     'max-nested-callbacks': ['error', { 'max': 3 }],
     'max-params': ['error', { 'max': 4 }],

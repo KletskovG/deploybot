@@ -1,12 +1,8 @@
-import { randomUUID } from 'node:crypto';
-
 import { describe, it, expect, afterAll, vi, beforeAll } from 'vitest';
 
 import { TABLES } from '@db/consts';
-import { getRandomDate, getRandomItem } from '@lib/utils/random';
-import type { ITransaction } from '@typings/core/transaction';
 
-import { categories, expenses, notes } from './mocks';
+import { createTestTransaction } from './mocks';
 
 const TEST_PREFIX = 'test-';
 
@@ -37,16 +33,6 @@ vi.mock('@db/consts', () => ({
 	},
 }));
 
-const createTestTransaction = (overrides: Partial<ITransaction> = {}): ITransaction => ({
-	id: `${TEST_PREFIX}${randomUUID()}`,
-	date: getRandomDate('2026-02-03', '2026-02-04'),
-	expense: getRandomItem(expenses),
-	category: getRandomItem(categories),
-	note: getRandomItem(notes),
-	timestamp: Date.now().toString(),
-	...overrides,
-});
-
 describe('insert transactions to DB', () => {
 	const insertedIds: string[] = [];
 
@@ -72,7 +58,7 @@ describe('insert transactions to DB', () => {
 	});
 
 	it('inserts single transaction successfully', async () => {
-		const transaction = createTestTransaction();
+		const transaction = createTestTransaction(TEST_PREFIX);
 		insertedIds.push(transaction.id);
 
 		const query = buildInsertQuery([transaction]);
@@ -92,7 +78,7 @@ describe('insert transactions to DB', () => {
 	});
 
 	it('inserts transaction with NULL optional fields', async () => {
-		const transaction = createTestTransaction({
+		const transaction = createTestTransaction(TEST_PREFIX, {
 			category: null,
 			note: null,
 		});
@@ -118,9 +104,9 @@ describe('insert transactions to DB', () => {
 
 	it('inserts multiple transactions in single query', async () => {
 		const transactions = [
-			createTestTransaction({ expense: 100 }),
-			createTestTransaction({ expense: 200 }),
-			createTestTransaction({ expense: 300 }),
+			createTestTransaction(TEST_PREFIX, { expense: 100 }),
+			createTestTransaction(TEST_PREFIX, { expense: 200 }),
+			createTestTransaction(TEST_PREFIX, { expense: 300 }),
 		];
 		transactions.forEach(t => insertedIds.push(t.id));
 

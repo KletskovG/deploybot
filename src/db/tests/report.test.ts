@@ -1,13 +1,10 @@
-import { randomUUID } from 'node:crypto';
-
 import { describe, it, expect, afterAll, vi, beforeAll } from 'vitest';
 
 import { TABLES } from '@db/consts';
-import { getRandomItem } from '@lib/utils/random';
 import { info } from '@logger';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
-import { categories, expenses, notes } from './mocks';
+import { createTestTransaction } from './mocks';
 
 const TEST_PREFIX = 'test-report-';
 
@@ -32,16 +29,6 @@ vi.mock('@db/consts', () => ({
 		transactions: 'transactions_dev',
 	},
 }));
-
-const createTestTransaction = (overrides: Partial<ITransaction> = {}): ITransaction => ({
-	id: `${TEST_PREFIX}${randomUUID()}`,
-	date: '2026-02-03',
-	expense: getRandomItem(expenses),
-	category: getRandomItem(categories),
-	note: getRandomItem(notes),
-	timestamp: Date.now().toString(),
-	...overrides,
-});
 
 describe('report transactions from DB', () => {
 	const insertedIds: string[] = [];
@@ -79,9 +66,9 @@ describe('report transactions from DB', () => {
 
 	describe('report query execution', () => {
 		it('finds transactions within date range', async () => {
-			const transaction1 = createTestTransaction({ date: '2026-02-05' });
-			const transaction2 = createTestTransaction({ date: '2026-02-10' });
-			const transaction3 = createTestTransaction({ date: '2026-02-15' });
+			const transaction1 = createTestTransaction(TEST_PREFIX, { date: '2026-02-05' });
+			const transaction2 = createTestTransaction(TEST_PREFIX, { date: '2026-02-10' });
+			const transaction3 = createTestTransaction(TEST_PREFIX, { date: '2026-02-15' });
 			await insertTransaction(transaction1);
 			await insertTransaction(transaction2);
 			await insertTransaction(transaction3);
@@ -121,8 +108,8 @@ describe('report transactions from DB', () => {
 		});
 
 		it('includes boundary dates in range', async () => {
-			const startDate = createTestTransaction({ date: '2026-05-01' });
-			const endDate = createTestTransaction({ date: '2026-05-31' });
+			const startDate = createTestTransaction(TEST_PREFIX, { date: '2026-05-01' });
+			const endDate = createTestTransaction(TEST_PREFIX, { date: '2026-05-31' });
 			await insertTransaction(startDate);
 			await insertTransaction(endDate);
 
