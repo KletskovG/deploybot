@@ -69,6 +69,35 @@ paths:
                     type: integer
                     description: Uptime in milliseconds (0 if not started)
 
+  /categories:
+    get:
+      summary: List categories
+      description: Returns all distinct expense categories from the database.
+      operationId: getCategories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  data:
+                    type: array
+                    items:
+                      type: string
+                    example: [food, transport, entertainment]
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /expense:
     get:
       summary: Create expense
