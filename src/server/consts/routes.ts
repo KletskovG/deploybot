@@ -4,4 +4,5 @@ export enum ROUTE {
   EXPENSE = '/expense',
   FIND = '/find',
   REPORT = '/report',
+  UPDATE = '/update',
 }
