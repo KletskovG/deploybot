@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { createExpense } from '@core';
+import { createCtx } from '@core/createCtx';
 import { HTTP_STATUS, ROUTE } from '@server/consts';
 import { IExpenseQueryParams } from '@typings/server/expense';
 
@@ -9,10 +10,11 @@ export async function expenseRoutes(fastify: FastifyInstance): Promise<void> {
 		request: FastifyRequest<{ Querystring: IExpenseQueryParams }>,
 		reply: FastifyReply,
 	) => {
-		const { date, expense, category, note } = request.query;
+		const { date, expense, category, income, note } = request.query;
+		const ctx = createCtx(request);
 
 		try {
-			const result = await createExpense({ date, expense, category, note });
+			const result = await createExpense(ctx.userId, { date, expense, category, note, income });
 			return reply.status(HTTP_STATUS.OK).send({
 				status: 'ok',
 				data: result,

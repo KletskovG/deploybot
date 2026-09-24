@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll, vi, beforeAll } from 'vitest';
 
-import { TABLES } from '@db/consts';
+import { TABLES, TEST_TABLE_ID } from '@db/consts';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
 import { createTestTransaction } from './mocks';
@@ -27,6 +27,7 @@ vi.mock('@db/consts', () => ({
 	TABLES: {
 		transactions: 'transactions_dev',
 	},
+	TEST_TABLE_ID: 1,
 }));
 
 describe('update transactions in DB', () => {
@@ -45,7 +46,7 @@ describe('update transactions in DB', () => {
 	});
 
 	const insertTransaction = async (transaction: ITransaction): Promise<void> => {
-		const query = buildInsertQuery([transaction]);
+		const query = buildInsertQuery(TEST_TABLE_ID, [transaction]);
 		await withConnection(async (sql) => await sql(query));
 		insertedIds.push(transaction.id);
 	};
@@ -65,7 +66,7 @@ describe('update transactions in DB', () => {
 
 	describe('buildUpdateQuery', () => {
 		it('builds query with single field', () => {
-			const query = buildUpdateQuery('test-id', { expense: 1500 });
+			const query = buildUpdateQuery(TEST_TABLE_ID, 'test-id', { expense: 1500 });
 
 			expect(query).toContain('UPDATE');
 			expect(query).toContain(TABLES.transactions);
@@ -75,13 +76,13 @@ describe('update transactions in DB', () => {
 		});
 
 		it('builds query with date field', () => {
-			const query = buildUpdateQuery('test-id', { date: '2026-02-05' });
+			const query = buildUpdateQuery(TEST_TABLE_ID, 'test-id', { date: '2026-02-05' });
 
 			expect(query).toContain("SET date = Date('2026-02-05')");
 		});
 
 		it('builds query with multiple fields', () => {
-			const query = buildUpdateQuery('test-id', {
+			const query = buildUpdateQuery(TEST_TABLE_ID, 'test-id', {
 				expense: 2000,
 				category: 'travel',
 				note: 'taxi',
@@ -93,7 +94,7 @@ describe('update transactions in DB', () => {
 		});
 
 		it('builds query with null category', () => {
-			const query = buildUpdateQuery('test-id', { category: null });
+			const query = buildUpdateQuery(TEST_TABLE_ID, 'test-id', { category: null });
 
 			expect(query).toContain('category = NULL');
 		});
@@ -104,7 +105,7 @@ describe('update transactions in DB', () => {
 			const transaction = createTestTransaction(TEST_PREFIX, { expense: 100 });
 			await insertTransaction(transaction);
 
-			const query = buildUpdateQuery(transaction.id, { expense: 9999 });
+			const query = buildUpdateQuery(TEST_TABLE_ID, transaction.id, { expense: 9999 });
 			const result = await withConnection(async (sql) => {
 				const [rows] = await sql<[ITransactionYDB]>(query);
 				return rows;
@@ -121,7 +122,7 @@ describe('update transactions in DB', () => {
 			const transaction = createTestTransaction(TEST_PREFIX, { date: '2026-02-03' });
 			await insertTransaction(transaction);
 
-			const query = buildUpdateQuery(transaction.id, { date: '2026-02-04' });
+			const query = buildUpdateQuery(TEST_TABLE_ID, transaction.id, { date: '2026-02-04' });
 			const result = await withConnection(async (sql) => {
 				const [rows] = await sql<[ITransactionYDB]>(query);
 				return rows;
@@ -141,7 +142,7 @@ describe('update transactions in DB', () => {
 			});
 			await insertTransaction(transaction);
 
-			const query = buildUpdateQuery(transaction.id, {
+			const query = buildUpdateQuery(TEST_TABLE_ID, transaction.id, {
 				expense: 5000,
 				category: 'travel',
 				note: 'flight tickets',
@@ -167,7 +168,7 @@ describe('update transactions in DB', () => {
 			});
 			await insertTransaction(transaction);
 
-			const query = buildUpdateQuery(transaction.id, { expense: 888 });
+			const query = buildUpdateQuery(TEST_TABLE_ID, transaction.id, { expense: 888 });
 			const result = await withConnection(async (sql) => {
 				const [rows] = await sql<[ITransactionYDB]>(query);
 				return rows;

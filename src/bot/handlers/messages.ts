@@ -4,8 +4,9 @@ import { getReport } from '@core';
 
 export async function handleTextMessage(ctx: Context): Promise<void> {
 	const text = ctx.message?.text;
+	const id = ctx.chat?.id;
 
-	if (!text) {
+	if (!text || !id) {
 		return;
 	}
 
@@ -15,7 +16,7 @@ export async function handleTextMessage(ctx: Context): Promise<void> {
 	}
 
 	if (text.toLowerCase().includes('report')) {
-		const report = await getReport({ dateFrom: '2026-02-01', dateTo: '2026-02-28' });
+		const report = await getReport(id, { dateFrom: '2026-02-01', dateTo: '2026-02-28' });
 		await ctx.reply(report);
 		return;
 	}

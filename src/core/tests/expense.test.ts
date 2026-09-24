@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { TEST_TABLE_ID } from '@db/consts';
 import { ValidationError } from '@lib/error';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
@@ -50,14 +51,14 @@ describe('createExpense', () => {
 	describe('validation', () => {
 		it('throws ValidationError for invalid date', async () => {
 			await expect(
-				createExpense({
+				createExpense(TEST_TABLE_ID, {
 					date: 'invalid-date',
 					expense: '100',
 				}),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				createExpense({
+				createExpense(TEST_TABLE_ID, {
 					date: 'invalid-date',
 					expense: '100',
 				}),
@@ -66,14 +67,14 @@ describe('createExpense', () => {
 
 		it('throws ValidationError for missing expense', async () => {
 			await expect(
-				createExpense({
+				createExpense(TEST_TABLE_ID, {
 					date: '2026-02-05',
 					expense: '',
 				}),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				createExpense({
+				createExpense(TEST_TABLE_ID, {
 					date: '2026-02-05',
 					expense: '',
 				}),
@@ -82,7 +83,7 @@ describe('createExpense', () => {
 
 		it('throws ValidationError for undefined expense', async () => {
 			await expect(
-				createExpense({
+				createExpense(TEST_TABLE_ID, {
 					date: '2026-02-05',
 					expense: undefined as unknown as string,
 				}),
@@ -95,7 +96,7 @@ describe('createExpense', () => {
 			mockReadTransactionsFromYDB.mockReturnValue([]);
 
 			await expect(
-				createExpense({
+				createExpense(TEST_TABLE_ID, {
 					date: '2026-02-05',
 					expense: '100',
 				}),
@@ -111,14 +112,14 @@ describe('createExpense', () => {
 		});
 
 		it('creates transaction with all fields', async () => {
-			await createExpense({
+			await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '500',
 				category: 'Food',
 				note: 'Groceries',
 			});
 
-			expect(mockBuildInsertQuery).toHaveBeenCalledWith([
+			expect(mockBuildInsertQuery).toHaveBeenCalledWith(1, [
 				expect.objectContaining({
 					id: expect.any(String),
 					date: '2026-02-05',
@@ -131,12 +132,12 @@ describe('createExpense', () => {
 		});
 
 		it('creates transaction without optional fields', async () => {
-			await createExpense({
+			await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '300',
 			});
 
-			expect(mockBuildInsertQuery).toHaveBeenCalledWith([
+			expect(mockBuildInsertQuery).toHaveBeenCalledWith(1, [
 				expect.objectContaining({
 					id: expect.any(String),
 					date: '2026-02-05',
@@ -147,12 +148,12 @@ describe('createExpense', () => {
 		});
 
 		it('formats date correctly', async () => {
-			await createExpense({
+			await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05T10:30:00Z',
 				expense: '100',
 			});
 
-			expect(mockBuildInsertQuery).toHaveBeenCalledWith([
+			expect(mockBuildInsertQuery).toHaveBeenCalledWith(1, [
 				expect.objectContaining({
 					date: '2026-02-05',
 				}),
@@ -160,13 +161,13 @@ describe('createExpense', () => {
 		});
 
 		it('converts category to lowercase and trims whitespace', async () => {
-			await createExpense({
+			await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '100',
 				category: '  FOOD  ',
 			});
 
-			expect(mockBuildInsertQuery).toHaveBeenCalledWith([
+			expect(mockBuildInsertQuery).toHaveBeenCalledWith(1, [
 				expect.objectContaining({
 					category: 'food',
 				}),
@@ -180,6 +181,7 @@ describe('createExpense', () => {
 				id: Buffer.from('test-uuid-123'),
 				date: new Date('2026-02-05'),
 				expense: BigInt(500),
+				income: BigInt(0),
 				category: Buffer.from('food'),
 				note: Buffer.from('groceries'),
 				timestamp: BigInt(1738713600000),
@@ -190,6 +192,7 @@ describe('createExpense', () => {
 			id: 'test-uuid-123',
 			date: '2026-02-05',
 			expense: 500,
+			income: 0,
 			category: 'food',
 			note: 'groceries',
 			timestamp: '1738713600000',
@@ -203,7 +206,7 @@ describe('createExpense', () => {
 			mockWithConnection.mockResolvedValue([mockYdbData]);
 			mockReadTransactionsFromYDB.mockReturnValue([mockTransaction]);
 
-			await createExpense({
+			await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '500',
 				category: 'food',
@@ -211,7 +214,7 @@ describe('createExpense', () => {
 			});
 
 			expect(mockBuildInsertQuery).toHaveBeenCalledTimes(1);
-			expect(mockBuildInsertQuery).toHaveBeenCalledWith([
+			expect(mockBuildInsertQuery).toHaveBeenCalledWith(1, [
 				expect.objectContaining({
 					date: '2026-02-05',
 					expense: 500,
@@ -225,7 +228,7 @@ describe('createExpense', () => {
 			mockWithConnection.mockResolvedValue([mockYdbData]);
 			mockReadTransactionsFromYDB.mockReturnValue([mockTransaction]);
 
-			await createExpense({
+			await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '500',
 			});
@@ -238,7 +241,7 @@ describe('createExpense', () => {
 			mockWithConnection.mockResolvedValue([mockYdbData]);
 			mockReadTransactionsFromYDB.mockReturnValue([mockTransaction]);
 
-			await createExpense({
+			await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '500',
 			});
@@ -251,7 +254,7 @@ describe('createExpense', () => {
 			mockWithConnection.mockResolvedValue([mockYdbData]);
 			mockReadTransactionsFromYDB.mockReturnValue([mockTransaction]);
 
-			const result = await createExpense({
+			const result = await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '500',
 				category: 'food',
@@ -273,7 +276,7 @@ describe('createExpense', () => {
 			const dbError = new Error('Database connection failed');
 			mockWithConnection.mockRejectedValue(dbError);
 
-			const result = await createExpense({
+			const result = await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '100',
 			});
@@ -287,7 +290,7 @@ describe('createExpense', () => {
 				throw queryError;
 			});
 
-			const result = await createExpense({
+			const result = await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '100',
 			});
@@ -302,7 +305,7 @@ describe('createExpense', () => {
 				throw transformError;
 			});
 
-			const result = await createExpense({
+			const result = await createExpense(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: '100',
 			});
@@ -312,7 +315,7 @@ describe('createExpense', () => {
 
 		it('does not catch validation errors', async () => {
 			await expect(
-				createExpense({
+				createExpense(TEST_TABLE_ID, {
 					date: 'invalid',
 					expense: '100',
 				}),

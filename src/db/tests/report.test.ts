@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll, vi, beforeAll } from 'vitest';
 
-import { TABLES } from '@db/consts';
+import { TABLES, TEST_TABLE_ID } from '@db/consts';
 import { info } from '@logger';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
@@ -28,6 +28,7 @@ vi.mock('@db/consts', () => ({
 	TABLES: {
 		transactions: 'transactions_dev',
 	},
+	TEST_TABLE_ID: 1,
 }));
 
 describe('report transactions from DB', () => {
@@ -55,7 +56,7 @@ describe('report transactions from DB', () => {
 	};
 
 	const insertTransaction = async (transaction: ITransaction): Promise<void> => {
-		const query = buildInsertQuery([transaction]);
+		const query = buildInsertQuery(TEST_TABLE_ID, [transaction]);
 		await withConnection(async (sql) => await sql(query));
 		insertedIds.push(transaction.id);
 	};
@@ -73,7 +74,7 @@ describe('report transactions from DB', () => {
 			await insertTransaction(transaction2);
 			await insertTransaction(transaction3);
 
-			const query = buildReportQuery({
+			const query = buildReportQuery(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-20',
 			});
@@ -92,7 +93,7 @@ describe('report transactions from DB', () => {
 		});
 
 		it('returns empty array when no transactions in range', async () => {
-			const query = buildReportQuery({
+			const query = buildReportQuery(TEST_TABLE_ID, {
 				dateFrom: '2099-01-01',
 				dateTo: '2099-12-31',
 			});
@@ -113,7 +114,7 @@ describe('report transactions from DB', () => {
 			await insertTransaction(startDate);
 			await insertTransaction(endDate);
 
-			const query = buildReportQuery({
+			const query = buildReportQuery(TEST_TABLE_ID, {
 				dateFrom: '2026-05-01',
 				dateTo: '2026-05-31',
 			});

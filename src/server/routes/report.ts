@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { getReport } from '@core';
+import { createCtx } from '@core/createCtx';
 import { HTTP_STATUS, ROUTE } from '@server/consts';
 
 export interface IReportQueryParams {
@@ -14,9 +15,10 @@ export async function reportRoutes(fastify: FastifyInstance): Promise<void> {
 		reply: FastifyReply,
 	) => {
 		const { dateFrom, dateTo } = request.query;
+		const ctx = createCtx(request);
 
 		try {
-			const csvPath = await getReport({ dateFrom, dateTo });
+			const csvPath = await getReport(ctx.userId, { dateFrom, dateTo });
 
 			if (csvPath) {
 				return reply.status(HTTP_STATUS.OK).send({

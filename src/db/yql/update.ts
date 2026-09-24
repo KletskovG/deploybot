@@ -27,7 +27,7 @@ const buildSetFields = (fields: UpdatableFields): string => {
 	return parts.join(', ');
 };
 
-export const buildUpdateQuery = (id: string, fields: UpdatableFields): string => {
+export const buildUpdateQuery = (userId: number, id: string, fields: UpdatableFields): string => {
 	const setClause = buildSetFields(fields);
-	return queries.update(TABLES.transactions, setClause, id);
+	return queries.update(`${TABLES.transactions}_${userId}`, setClause, id);
 };

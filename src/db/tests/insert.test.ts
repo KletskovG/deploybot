@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll, vi, beforeAll } from 'vitest';
 
-import { TABLES } from '@db/consts';
+import { TABLES, TEST_TABLE_ID } from '@db/consts';
 
 import { createTestTransaction } from './mocks';
 
@@ -31,6 +31,7 @@ vi.mock('@db/consts', () => ({
 	TABLES: {
 		transactions: 'transactions_dev',
 	},
+	TEST_TABLE_ID: 1,
 }));
 
 describe('insert transactions to DB', () => {
@@ -49,7 +50,7 @@ describe('insert transactions to DB', () => {
 
 		const idList = ids.map(id => `'${id}'`).join(', ');
 		await withConnection(async (sql) => {
-			await sql(`DELETE FROM ${TABLES.transactions} WHERE id IN (${idList})`);
+			await sql(`DELETE FROM ${TABLES.transactions}_1 WHERE id IN (${idList})`);
 		});
 	};
 
@@ -61,7 +62,7 @@ describe('insert transactions to DB', () => {
 		const transaction = createTestTransaction(TEST_PREFIX);
 		insertedIds.push(transaction.id);
 
-		const query = buildInsertQuery([transaction]);
+		const query = buildInsertQuery(TEST_TABLE_ID, [transaction]);
 
 		await expect(
 			withConnection(async (sql) => await sql(query)),
@@ -69,7 +70,7 @@ describe('insert transactions to DB', () => {
 
 		const result = await withConnection(async (sql) => {
 			const [[row]] = await sql<[{ id: Buffer }]>(
-				`SELECT id FROM ${TABLES.transactions} WHERE id = '${transaction.id}'`,
+				`SELECT id FROM ${TABLES.transactions}_1 WHERE id = '${transaction.id}'`,
 			);
 			return row;
 		});
@@ -84,7 +85,7 @@ describe('insert transactions to DB', () => {
 		});
 		insertedIds.push(transaction.id);
 
-		const query = buildInsertQuery([transaction]);
+		const query = buildInsertQuery(TEST_TABLE_ID, [transaction]);
 
 		await expect(
 			withConnection(async (sql) => await sql(query)),
@@ -92,7 +93,7 @@ describe('insert transactions to DB', () => {
 
 		const result = await withConnection(async (sql) => {
 			const [[row]] = await sql<[{ id: Buffer; category: Buffer | null; note: Buffer | null }]>(
-				`SELECT id, category, note FROM ${TABLES.transactions} WHERE id = '${transaction.id}'`,
+				`SELECT id, category, note FROM ${TABLES.transactions}_1 WHERE id = '${transaction.id}'`,
 			);
 			return row;
 		});
@@ -110,7 +111,7 @@ describe('insert transactions to DB', () => {
 		];
 		transactions.forEach(t => insertedIds.push(t.id));
 
-		const query = buildInsertQuery(transactions);
+		const query = buildInsertQuery(TEST_TABLE_ID ,transactions);
 
 		await expect(
 			withConnection(async (sql) => await sql(query)),
@@ -119,7 +120,7 @@ describe('insert transactions to DB', () => {
 		const result = await withConnection(async (sql) => {
 			const idList = transactions.map(t => `'${t.id}'`).join(', ');
 			const [rows] = await sql<[{ id: Buffer }]>(
-				`SELECT id FROM ${TABLES.transactions} WHERE id IN (${idList})`,
+				`SELECT id FROM ${TABLES.transactions}_1 WHERE id IN (${idList})`,
 			);
 			return rows;
 		});

@@ -46,6 +46,7 @@ export const createTestTransaction = (prefix: string, overrides: Partial<ITransa
 	id: `${prefix}${randomUUID()}`,
 	date: getRandomDate('2026-02-03', '2026-02-04'),
 	expense: getRandomItem(expenses),
+	income: 0,
 	category: getRandomItem(categories),
 	note: getRandomItem(notes),
 	timestamp: Date.now().toString(),

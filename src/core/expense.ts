@@ -10,9 +10,10 @@ import { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 import { IExpenseQueryParams } from '@typings/server/expense';
 
 export async function createExpense(
+	userId: number,
 	params: IExpenseQueryParams,
 ): Promise<ITransaction[]> {
-	const { date, expense, category, note } = params;
+	const { date, expense, category, note, income } = params;
 
 	if (!isValidDate(date)) {
 		throw new ValidationError('Invalid date');
@@ -26,12 +27,13 @@ export async function createExpense(
 		id: randomUUID(),
 		date: formatDate(new Date(date)),
 		expense: Number(expense),
+		income: income ? Number(income) : 0,
 		category: String(category).toLowerCase().trim() ?? null,
 		note: String(note).toLowerCase().trim() ?? null,
 		timestamp: new Date().getTime().toString(),
 	}];
 
-	const query = buildInsertQuery(transactionsList);
+	const query = buildInsertQuery(userId, transactionsList);
 
 	try {
 		const [data] = await withConnection(async (sql) => await sql<ITransactionYDB[]>(query));

@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { updateTransaction } from '@core';
+import { createCtx } from '@core/createCtx';
 import { HTTP_STATUS, ROUTE } from '@server/consts';
 import { ITransaction } from '@typings/core/transaction';
 
@@ -9,10 +10,14 @@ export async function updateRoutes(fastify: FastifyInstance): Promise<void> {
 		request: FastifyRequest<{ Querystring: ITransaction }>,
 		reply: FastifyReply,
 	) => {
-		const { id, date, expense, category, note, timestamp } = request.query;
+		const { id, date, expense, income, category, note, timestamp } = request.query;
+		const ctx = createCtx(request);
 
 		try {
-			const result = await updateTransaction({ id, date, expense, category, note, timestamp });
+			const result = await updateTransaction(
+				ctx.userId,
+				{ id, date, expense, income, category, note, timestamp },
+			);
 			return reply.status(HTTP_STATUS.OK).send({
 				status: 'ok',
 				data: result,

@@ -7,6 +7,7 @@ import { error } from '@logger';
 import { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
 export async function updateTransaction(
+	userId: number,
 	params: ITransaction,
 ): Promise<ITransaction[]> {
 	const { id, date, expense, category, note } = params;
@@ -45,7 +46,7 @@ export async function updateTransaction(
 		throw new ValidationError('Update: No fields to update');
 	}
 
-	const query = buildUpdateQuery(id, fields);
+	const query = buildUpdateQuery(userId, id, fields);
 
 	try {
 		return await withConnection(async (sql) => {
