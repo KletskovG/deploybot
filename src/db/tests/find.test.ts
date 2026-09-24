@@ -1,6 +1,6 @@
 import { describe, it, expect, afterAll, vi, beforeAll } from 'vitest';
 
-import { TABLES } from '@db/consts';
+import { TABLES, TEST_TABLE_ID } from '@db/consts';
 import { info } from '@logger';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
@@ -28,6 +28,7 @@ vi.mock('@db/consts', () => ({
 	TABLES: {
 		transactions: 'transactions_dev',
 	},
+	TEST_TABLE_ID: 1,
 }));
 
 describe('find transactions in DB', () => {
@@ -50,12 +51,12 @@ describe('find transactions in DB', () => {
 
 		const idList = ids.map(id => `'${id}'`).join(', ');
 		await withConnection(async (sql) => {
-			await sql(`DELETE FROM ${TABLES.transactions} WHERE id IN (${idList})`);
+			await sql(`DELETE FROM ${TABLES.transactions}_1 WHERE id IN (${idList})`);
 		});
 	};
 
 	const insertTransaction = async (transaction: ITransaction): Promise<void> => {
-		const query = buildInsertQuery([transaction]);
+		const query = buildInsertQuery(TEST_TABLE_ID, [transaction]);
 		await withConnection(async (sql) => await sql(query));
 		insertedIds.push(transaction.id);
 	};
@@ -66,7 +67,7 @@ describe('find transactions in DB', () => {
 
 	describe('buildFindQuery', () => {
 		it('builds query without filters', () => {
-			const query = buildFindQuery({});
+			const query = buildFindQuery(TEST_TABLE_ID, {});
 
 			expect(query).toContain('SELECT * FROM');
 			expect(query).toContain(TABLES.transactions);
@@ -75,31 +76,31 @@ describe('find transactions in DB', () => {
 		});
 
 		it('builds query with date filter', () => {
-			const query = buildFindQuery({ date: '2026-02-03' });
+			const query = buildFindQuery(TEST_TABLE_ID, { date: '2026-02-03' });
 
 			expect(query).toContain("WHERE date = Date('2026-02-03')");
 		});
 
 		it('builds query with expense filter', () => {
-			const query = buildFindQuery({ expense: 500 });
+			const query = buildFindQuery(TEST_TABLE_ID, { expense: 500 });
 
 			expect(query).toContain('WHERE expense = 500');
 		});
 
 		it('builds query with category filter', () => {
-			const query = buildFindQuery({ category: 'food' });
+			const query = buildFindQuery(TEST_TABLE_ID, { category: 'food' });
 
 			expect(query).toContain("WHERE category = 'food'");
 		});
 
 		it('builds query with note filter', () => {
-			const query = buildFindQuery({ note: 'groceries' });
+			const query = buildFindQuery(TEST_TABLE_ID, { note: 'groceries' });
 
 			expect(query).toContain("WHERE note = 'groceries'");
 		});
 
 		it('builds query with multiple filters', () => {
-			const query = buildFindQuery({
+			const query = buildFindQuery(TEST_TABLE_ID, {
 				date: '2026-02-03',
 				expense: 500,
 				category: 'food',
@@ -118,6 +119,7 @@ describe('find transactions in DB', () => {
 					id: Buffer.from('test-id-123'),
 					date: new Date('2026-02-03'),
 					expense: BigInt(500),
+					income: BigInt(0),
 					category: Buffer.from('food'),
 					note: Buffer.from('groceries'),
 					timestamp: BigInt(1738540800000),
@@ -141,6 +143,7 @@ describe('find transactions in DB', () => {
 					id: Buffer.from('test-id-456'),
 					date: new Date('2026-02-03'),
 					expense: BigInt(250),
+					income: BigInt(0),
 					category: null,
 					note: null,
 					timestamp: BigInt(1738540800000),
@@ -160,6 +163,7 @@ describe('find transactions in DB', () => {
 					id: Buffer.from('test-id-1'),
 					date: new Date('2026-02-03'),
 					expense: BigInt(100),
+					income: BigInt(0),
 					category: Buffer.from('food'),
 					note: null,
 					timestamp: BigInt(1738540800000),
@@ -168,6 +172,7 @@ describe('find transactions in DB', () => {
 					id: Buffer.from('test-id-2'),
 					date: new Date('2026-02-04'),
 					expense: BigInt(200),
+					income: BigInt(0),
 					category: null,
 					note: Buffer.from('transport'),
 					timestamp: BigInt(1738627200000),
@@ -188,7 +193,7 @@ describe('find transactions in DB', () => {
 			const transaction = createTestTransaction(TEST_PREFIX, { date: testDate });
 			await insertTransaction(transaction);
 
-			const query = buildFindQuery({ date: testDate });
+			const query = buildFindQuery(TEST_TABLE_ID, { date: testDate });
 			const result = await withConnection(async (sql) => {
 				const [rows] = await sql<[ITransactionYDB]>(query);
 				info('DB result: \n', rows);
@@ -207,7 +212,7 @@ describe('find transactions in DB', () => {
 			const transaction = createTestTransaction(TEST_PREFIX, { expense: testExpense });
 			await insertTransaction(transaction);
 
-			const query = buildFindQuery({ expense: testExpense });
+			const query = buildFindQuery(TEST_TABLE_ID, { expense: testExpense });
 			const result = await withConnection(async (sql) => {
 				const [rows] = await sql<[ITransactionYDB]>(query);
 				info('DB result: \n', rows);
@@ -226,7 +231,7 @@ describe('find transactions in DB', () => {
 			const transaction = createTestTransaction(TEST_PREFIX, { category: testCategory });
 			await insertTransaction(transaction);
 
-			const query = buildFindQuery({ category: testCategory });
+			const query = buildFindQuery(TEST_TABLE_ID, { category: testCategory });
 			const result = await withConnection(async (sql) => {
 				const [rows] = await sql<[ITransactionYDB]>(query);
 				info('DB result: \n', rows);
@@ -245,7 +250,7 @@ describe('find transactions in DB', () => {
 			const transaction = createTestTransaction(TEST_PREFIX, { note: testNote });
 			await insertTransaction(transaction);
 
-			const query = buildFindQuery({ note: testNote });
+			const query = buildFindQuery(TEST_TABLE_ID, { note: testNote });
 			const result = await withConnection(async (sql) => {
 				const [rows] = await sql<[ITransactionYDB]>(query);
 				info('DB result: \n', rows);
@@ -270,7 +275,7 @@ describe('find transactions in DB', () => {
 			});
 			await insertTransaction(transaction);
 
-			const query = buildFindQuery({
+			const query = buildFindQuery(TEST_TABLE_ID, {
 				date: testDate,
 				expense: testExpense,
 				category: testCategory,
@@ -288,7 +293,7 @@ describe('find transactions in DB', () => {
 		});
 
 		it('returns empty array when no matches found', async () => {
-			const query = buildFindQuery({ category: 'non-existent-category-xyz' });
+			const query = buildFindQuery(TEST_TABLE_ID, { category: 'non-existent-category-xyz' });
 			const result = await withConnection(async (sql) => {
 				const [rows] = await sql<[ITransactionYDB]>(query);
 				info('DB result: \n', rows);

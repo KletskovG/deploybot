@@ -8,6 +8,7 @@ export const readTransactionsFromYDB = (result: ITransactionYDB[]): ITransaction
 			id: item.id.toString(),
 			date: formatDate(new Date(item.date)),
 			expense: Number(item.expense),
+			income: Number(item.income),
 			category: item.category?.toString(),
 			note: item.note?.toString(),
 			timestamp: item.timestamp.toString(),

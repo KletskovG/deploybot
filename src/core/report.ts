@@ -15,7 +15,7 @@ export interface IReportParams {
   dateTo: string;
 }
 
-const CSV_HEADERS = ['id', 'date', 'expense', 'category', 'note', 'timestamp'] as const;
+const CSV_HEADERS = ['id', 'date', 'expense', 'category', 'note', 'timestamp', 'income'] as const;
 
 const escapeCSVValue = (value: string | number | null | undefined): string => {
 	if (value === null || value === undefined) return '';
@@ -35,6 +35,7 @@ const transactionsToCSV = (transactions: Array<Partial<ITransaction>>): string =
 };
 
 export async function getReport(
+	userId: number,
 	params: IReportParams,
 ): Promise<string> {
 	const { dateFrom, dateTo } = params;
@@ -55,7 +56,7 @@ export async function getReport(
 		dateTo: formattedDateTo,
 	};
 
-	const query = buildReportQuery(filters);
+	const query = buildReportQuery(userId, filters);
 
 	try {
 		const transactions = await withConnection(async (sql) => {

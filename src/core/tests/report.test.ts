@@ -1,6 +1,7 @@
 /* eslint-disable prefer-destructuring */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+import { TEST_TABLE_ID } from '@db/consts';
 import { ValidationError } from '@lib/error';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
@@ -76,14 +77,14 @@ describe('getReport', () => {
 	describe('validation', () => {
 		it('throws ValidationError for invalid dateFrom', async () => {
 			await expect(
-				getReport({
+				getReport(TEST_TABLE_ID, {
 					dateFrom: 'invalid-date',
 					dateTo: '2026-02-10',
 				}),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				getReport({
+				getReport(TEST_TABLE_ID, {
 					dateFrom: 'invalid-date',
 					dateTo: '2026-02-10',
 				}),
@@ -92,14 +93,14 @@ describe('getReport', () => {
 
 		it('throws ValidationError for invalid dateTo', async () => {
 			await expect(
-				getReport({
+				getReport(TEST_TABLE_ID, {
 					dateFrom: '2026-02-01',
 					dateTo: 'invalid-date',
 				}),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				getReport({
+				getReport(TEST_TABLE_ID, {
 					dateFrom: '2026-02-01',
 					dateTo: 'invalid-date',
 				}),
@@ -115,7 +116,7 @@ describe('getReport', () => {
 			mockRm.mockResolvedValue(undefined);
 
 			await expect(
-				getReport({
+				getReport(TEST_TABLE_ID, {
 					dateFrom: '2026-02-01',
 					dateTo: '2026-02-10',
 				}),
@@ -134,24 +135,24 @@ describe('getReport', () => {
 		});
 
 		it('formats dates before building query', async () => {
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
 
-			expect(mockBuildReportQuery).toHaveBeenCalledWith({
+			expect(mockBuildReportQuery).toHaveBeenCalledWith(1, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
 		});
 
 		it('handles dates with time component', async () => {
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01T00:00:00Z',
 				dateTo: '2026-02-10T23:59:59Z',
 			});
 
-			expect(mockBuildReportQuery).toHaveBeenCalledWith({
+			expect(mockBuildReportQuery).toHaveBeenCalledWith(1, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -164,6 +165,7 @@ describe('getReport', () => {
 				id: Buffer.from('test-id-1'),
 				date: new Date('2026-02-05'),
 				expense: BigInt(500),
+				income: BigInt(0),
 				category: Buffer.from('food'),
 				note: Buffer.from('groceries'),
 				timestamp: BigInt(1738713600000),
@@ -172,6 +174,7 @@ describe('getReport', () => {
 				id: Buffer.from('test-id-2'),
 				date: new Date('2026-02-06'),
 				expense: BigInt(300),
+				income: BigInt(0),
 				category: Buffer.from('transport'),
 				note: null,
 				timestamp: BigInt(1738800000000),
@@ -183,6 +186,7 @@ describe('getReport', () => {
 				id: 'test-id-1',
 				date: '2026-02-05',
 				expense: 500,
+				income: 0,
 				category: 'food',
 				note: 'groceries',
 				timestamp: '1738713600000',
@@ -191,6 +195,7 @@ describe('getReport', () => {
 				id: 'test-id-2',
 				date: '2026-02-06',
 				expense: 300,
+				income: 0,
 				category: 'transport',
 				timestamp: '1738800000000',
 			},
@@ -207,7 +212,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -223,7 +228,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -246,6 +251,7 @@ describe('getReport', () => {
 					id: 'test-id-1',
 					date: '2026-02-05',
 					expense: 500,
+					income: 0,
 					category: 'food',
 					note: 'groceries',
 					timestamp: '1738713600000',
@@ -256,7 +262,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -272,6 +278,7 @@ describe('getReport', () => {
 					id: 'test-id-1',
 					date: '2026-02-05',
 					expense: 500,
+					income: 0,
 					category: 'food',
 					note: 'groceries',
 					timestamp: '1738713600000',
@@ -282,7 +289,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -296,13 +303,13 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue([]);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
 
 			const [, csvContent] = mockWriteFile.mock.calls[0];
-			expect(csvContent).toBe('id,date,expense,category,note,timestamp');
+			expect(csvContent).toBe('id,date,expense,category,note,timestamp,income');
 		});
 
 		it('escapes CSV values with commas', async () => {
@@ -311,6 +318,7 @@ describe('getReport', () => {
 					id: 'test-id-1',
 					date: '2026-02-05',
 					expense: 500,
+					income: 0,
 					category: 'food',
 					note: 'groceries, snacks',
 					timestamp: '1738713600000',
@@ -321,7 +329,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -336,6 +344,7 @@ describe('getReport', () => {
 					id: 'test-id-1',
 					date: '2026-02-05',
 					expense: 500,
+					income: 0,
 					category: 'food',
 					note: 'John\'s "special" groceries',
 					timestamp: '1738713600000',
@@ -346,7 +355,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -361,6 +370,7 @@ describe('getReport', () => {
 					id: 'test-id-1',
 					date: '2026-02-05',
 					expense: 500,
+					income: 0,
 					category: null,
 					note: null,
 					timestamp: '1738713600000',
@@ -371,7 +381,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -386,6 +396,7 @@ describe('getReport', () => {
 					id: 'test-id-1',
 					date: '2026-02-05',
 					expense: 500,
+					income: 0,
 					timestamp: '1738713600000',
 				},
 			];
@@ -394,7 +405,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -416,7 +427,7 @@ describe('getReport', () => {
 		it('writes CSV to file with .csv extension', async () => {
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -429,7 +440,7 @@ describe('getReport', () => {
 		it('writes CSV with utf-8 encoding', async () => {
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -444,7 +455,7 @@ describe('getReport', () => {
 		it('uploads CSV to S3', async () => {
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -456,7 +467,7 @@ describe('getReport', () => {
 		it('deletes local file after successful S3 upload', async () => {
 			mockUploadToS3.mockResolvedValue('https://s3.example.com/file.csv');
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -470,7 +481,7 @@ describe('getReport', () => {
 			const s3Url = 'https://s3.example.com/report-123.csv';
 			mockUploadToS3.mockResolvedValue(s3Url);
 
-			const result = await getReport({
+			const result = await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -481,7 +492,7 @@ describe('getReport', () => {
 		it('returns local file path if S3 upload fails', async () => {
 			mockUploadToS3.mockResolvedValue(null);
 
-			const result = await getReport({
+			const result = await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -493,7 +504,7 @@ describe('getReport', () => {
 		it('returns local file path if S3 upload returns empty string', async () => {
 			mockUploadToS3.mockResolvedValue('');
 
-			const result = await getReport({
+			const result = await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -512,7 +523,7 @@ describe('getReport', () => {
 			const dbError = new Error('Database connection failed');
 			mockWithConnection.mockRejectedValue(dbError);
 
-			const result = await getReport({
+			const result = await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -526,7 +537,7 @@ describe('getReport', () => {
 				throw queryError;
 			});
 
-			const result = await getReport({
+			const result = await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -540,7 +551,7 @@ describe('getReport', () => {
 			mockReadTransactionsFromYDB.mockReturnValue([]);
 			mockWriteFile.mockRejectedValue(writeError);
 
-			const result = await getReport({
+			const result = await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -550,7 +561,7 @@ describe('getReport', () => {
 
 		it('does not catch validation errors', async () => {
 			await expect(
-				getReport({
+				getReport(TEST_TABLE_ID, {
 					dateFrom: 'invalid',
 					dateTo: '2026-02-10',
 				}),
@@ -569,12 +580,12 @@ describe('getReport', () => {
 		});
 
 		it('handles same dateFrom and dateTo', async () => {
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-05',
 				dateTo: '2026-02-05',
 			});
 
-			expect(mockBuildReportQuery).toHaveBeenCalledWith({
+			expect(mockBuildReportQuery).toHaveBeenCalledWith(1, {
 				dateFrom: '2026-02-05',
 				dateTo: '2026-02-05',
 			});
@@ -585,6 +596,7 @@ describe('getReport', () => {
 				id: `test-id-${i}`,
 				date: '2026-02-05',
 				expense: 100 + i,
+				income: 0,
 				category: 'test',
 				note: `note ${i}`,
 				timestamp: `${1738713600000 + i}`,
@@ -593,7 +605,7 @@ describe('getReport', () => {
 			mockWithConnection.mockResolvedValue(largeTransactionList);
 			mockReadTransactionsFromYDB.mockReturnValue(largeTransactionList);
 
-			const result = await getReport({
+			const result = await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});
@@ -608,6 +620,7 @@ describe('getReport', () => {
 					id: 'test-id-1',
 					date: '2026-02-05',
 					expense: 500,
+					income: 0,
 					category: 'food',
 					note: 'line1\nline2',
 					timestamp: '1738713600000',
@@ -617,7 +630,7 @@ describe('getReport', () => {
 			mockWithConnection.mockResolvedValue(mockTransactions);
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 
-			await getReport({
+			await getReport(TEST_TABLE_ID, {
 				dateFrom: '2026-02-01',
 				dateTo: '2026-02-10',
 			});

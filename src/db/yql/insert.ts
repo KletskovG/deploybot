@@ -9,6 +9,7 @@ const transactionList = (transactions: ITransaction[]): string => {
 			id,
 			date,
 			expense,
+			income,
 			category,
 			note,
 			timestamp,
@@ -20,12 +21,13 @@ const transactionList = (transactions: ITransaction[]): string => {
     ${expense},
     ${category ? `'${category}'` : 'NULL'},
     ${note ? `'${note}'` : 'NULL'},
-    ${timestamp}
+    ${timestamp},
+	${income}
     )`;
 	}).join(',');
 };
 
-export const buildInsertQuery = (transactions: ITransaction[]): string => {
+export const buildInsertQuery = (userId: number, transactions: ITransaction[]): string => {
 	const list = transactionList(transactions);
-	return queries.insert(TABLES.transactions, list);
+	return queries.insert(`${TABLES.transactions}_${userId}`, list);
 };

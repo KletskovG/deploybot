@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { TEST_TABLE_ID } from '@db/consts';
 import { ValidationError } from '@lib/error';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
@@ -50,21 +51,21 @@ describe('findTransactions', () => {
 	describe('validation', () => {
 		it('throws ValidationError for invalid date', async () => {
 			await expect(
-				findTransactions({ date: 'invalid-date' }),
+				findTransactions(TEST_TABLE_ID, { date: 'invalid-date' }),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				findTransactions({ date: 'invalid-date' }),
+				findTransactions(TEST_TABLE_ID, { date: 'invalid-date' }),
 			).rejects.toThrow('Invalid date');
 		});
 
 		it('throws ValidationError for invalid expense (non-numeric)', async () => {
 			await expect(
-				findTransactions({ expense: 'not-a-number' as unknown as number }),
+				findTransactions(TEST_TABLE_ID, { expense: 'not-a-number' as unknown as number }),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				findTransactions({ expense: 'not-a-number' as unknown as number }),
+				findTransactions(TEST_TABLE_ID, { expense: 'not-a-number' as unknown as number }),
 			).rejects.toThrow('Invalid expense value');
 		});
 
@@ -74,7 +75,7 @@ describe('findTransactions', () => {
 			mockReadTransactionsFromYDB.mockReturnValue([]);
 
 			await expect(
-				findTransactions({ date: '2026-02-05' }),
+				findTransactions(TEST_TABLE_ID, { date: '2026-02-05' }),
 			).resolves.not.toThrow();
 		});
 
@@ -84,7 +85,7 @@ describe('findTransactions', () => {
 			mockReadTransactionsFromYDB.mockReturnValue([]);
 
 			await expect(
-				findTransactions({ expense: 100 }),
+				findTransactions(TEST_TABLE_ID, { expense: 100 }),
 			).resolves.not.toThrow();
 		});
 	});
@@ -99,46 +100,46 @@ describe('findTransactions', () => {
 		});
 
 		it('processes date filter and formats it', async () => {
-			await findTransactions({ date: '2026-02-05' });
+			await findTransactions(TEST_TABLE_ID, { date: '2026-02-05' });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				date: '2026-02-05',
 			});
 		});
 
 		it('processes expense filter and converts to number', async () => {
-			await findTransactions({ expense: '500' as unknown as number });
+			await findTransactions(TEST_TABLE_ID, { expense: '500' as unknown as number });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				expense: 500,
 			});
 		});
 
 		it('processes category filter and converts to string', async () => {
-			await findTransactions({ category: 'food' });
+			await findTransactions(TEST_TABLE_ID, { category: 'food' });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				category: 'food',
 			});
 		});
 
 		it('processes note filter and converts to string', async () => {
-			await findTransactions({ note: 'groceries' });
+			await findTransactions(TEST_TABLE_ID, { note: 'groceries' });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				note: 'groceries',
 			});
 		});
 
 		it('processes multiple filters together', async () => {
-			await findTransactions({
+			await findTransactions(TEST_TABLE_ID, {
 				date: '2026-02-05',
 				expense: 500,
 				category: 'food',
 				note: 'groceries',
 			});
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				date: '2026-02-05',
 				expense: 500,
 				category: 'food',
@@ -147,9 +148,9 @@ describe('findTransactions', () => {
 		});
 
 		it('omits undefined filters', async () => {
-			await findTransactions({ date: '2026-02-05' });
+			await findTransactions(TEST_TABLE_ID, { date: '2026-02-05' });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				date: '2026-02-05',
 			});
 			expect(mockBuildFindQuery).not.toHaveBeenCalledWith(
@@ -158,9 +159,9 @@ describe('findTransactions', () => {
 		});
 
 		it('handles empty filters object', async () => {
-			await findTransactions({});
+			await findTransactions(TEST_TABLE_ID, {});
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({});
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {});
 		});
 	});
 
@@ -170,6 +171,7 @@ describe('findTransactions', () => {
 				id: Buffer.from('test-id-1'),
 				date: new Date('2026-02-05'),
 				expense: BigInt(500),
+				income: BigInt(0),
 				category: Buffer.from('food'),
 				note: Buffer.from('groceries'),
 				timestamp: BigInt(1738713600000),
@@ -178,6 +180,7 @@ describe('findTransactions', () => {
 				id: Buffer.from('test-id-2'),
 				date: new Date('2026-02-06'),
 				expense: BigInt(300),
+				income: BigInt(0),
 				category: Buffer.from('transport'),
 				note: null,
 				timestamp: BigInt(1738800000000),
@@ -189,6 +192,7 @@ describe('findTransactions', () => {
 				id: 'test-id-1',
 				date: '2026-02-05',
 				expense: 500,
+				income: 0,
 				category: 'food',
 				note: 'groceries',
 				timestamp: '1738713600000',
@@ -197,6 +201,7 @@ describe('findTransactions', () => {
 				id: 'test-id-2',
 				date: '2026-02-06',
 				expense: 300,
+				income: 0,
 				category: 'transport',
 				timestamp: '1738800000000',
 			},
@@ -212,10 +217,10 @@ describe('findTransactions', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 
-			await findTransactions({ date: '2026-02-05', expense: 500 });
+			await findTransactions(TEST_TABLE_ID, { date: '2026-02-05', expense: 500 });
 
 			expect(mockBuildFindQuery).toHaveBeenCalledTimes(1);
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				date: '2026-02-05',
 				expense: 500,
 			});
@@ -227,7 +232,7 @@ describe('findTransactions', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 
-			await findTransactions({ date: '2026-02-05' });
+			await findTransactions(TEST_TABLE_ID, { date: '2026-02-05' });
 
 			expect(mockWithConnection).toHaveBeenCalledTimes(1);
 			expect(mockWithConnection).toHaveBeenCalledWith(expect.any(Function));
@@ -239,7 +244,7 @@ describe('findTransactions', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 
-			await findTransactions({ date: '2026-02-05' });
+			await findTransactions(TEST_TABLE_ID, { date: '2026-02-05' });
 
 			expect(mockReadTransactionsFromYDB).toHaveBeenCalledTimes(1);
 			expect(mockReadTransactionsFromYDB).toHaveBeenCalledWith(mockYdbData);
@@ -251,7 +256,7 @@ describe('findTransactions', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue(mockTransactions);
 
-			const result = await findTransactions({ date: '2026-02-05' });
+			const result = await findTransactions(TEST_TABLE_ID, { date: '2026-02-05' });
 
 			expect(result).toEqual(mockTransactions);
 			expect(result).toHaveLength(2);
@@ -265,7 +270,7 @@ describe('findTransactions', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue([]);
 
-			const result = await findTransactions({ category: 'non-existent' });
+			const result = await findTransactions(TEST_TABLE_ID, { category: 'non-existent' });
 
 			expect(result).toEqual([]);
 			expect(result).toHaveLength(0);
@@ -281,7 +286,7 @@ describe('findTransactions', () => {
 			const dbError = new Error('Database connection failed');
 			mockWithConnection.mockRejectedValue(dbError);
 
-			const result = await findTransactions({ date: '2026-02-05' });
+			const result = await findTransactions(TEST_TABLE_ID, { date: '2026-02-05' });
 
 			expect(result).toEqual([]);
 		});
@@ -292,7 +297,7 @@ describe('findTransactions', () => {
 				throw queryError;
 			});
 
-			const result = await findTransactions({ expense: 100 });
+			const result = await findTransactions(TEST_TABLE_ID, { expense: 100 });
 
 			expect(result).toEqual([]);
 		});
@@ -306,14 +311,14 @@ describe('findTransactions', () => {
 				throw transformError;
 			});
 
-			const result = await findTransactions({ date: '2026-02-05' });
+			const result = await findTransactions(TEST_TABLE_ID, { date: '2026-02-05' });
 
 			expect(result).toEqual([]);
 		});
 
 		it('does not catch validation errors', async () => {
 			await expect(
-				findTransactions({ date: 'invalid' }),
+				findTransactions(TEST_TABLE_ID, { date: 'invalid' }),
 			).rejects.toThrow(ValidationError);
 		});
 	});
@@ -328,53 +333,53 @@ describe('findTransactions', () => {
 		});
 
 		it('handles expense as string number', async () => {
-			await findTransactions({ expense: '123' as unknown as number });
+			await findTransactions(TEST_TABLE_ID, { expense: '123' as unknown as number });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				expense: 123,
 			});
 		});
 
 		it('handles expense as zero (omits it as falsy)', async () => {
-			await findTransactions({ expense: 0 });
+			await findTransactions(TEST_TABLE_ID, { expense: 0 });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({});
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {});
 		});
 
 		it('handles negative expense', async () => {
-			await findTransactions({ expense: -100 });
+			await findTransactions(TEST_TABLE_ID, { expense: -100 });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				expense: -100,
 			});
 		});
 
 		it('handles category as number (converts to string)', async () => {
-			await findTransactions({ category: 123 as unknown as string });
+			await findTransactions(TEST_TABLE_ID, { category: 123 as unknown as string });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				category: '123',
 			});
 		});
 
 		it('handles note as number (converts to string)', async () => {
-			await findTransactions({ note: 456 as unknown as string });
+			await findTransactions(TEST_TABLE_ID, { note: 456 as unknown as string });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				note: '456',
 			});
 		});
 
 		it('handles date with time component', async () => {
-			await findTransactions({ date: '2026-02-05T10:30:00Z' });
+			await findTransactions(TEST_TABLE_ID, { date: '2026-02-05T10:30:00Z' });
 
-			expect(mockBuildFindQuery).toHaveBeenCalledWith({
+			expect(mockBuildFindQuery).toHaveBeenCalledWith(1, {
 				date: '2026-02-05',
 			});
 		});
 
 		it('handles empty string filters (omits them)', async () => {
-			await findTransactions({
+			await findTransactions(TEST_TABLE_ID, {
 				category: '',
 				note: '',
 			});

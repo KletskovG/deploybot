@@ -7,7 +7,7 @@ export interface IReportFilters {
   dateTo: string;
 }
 
-export const buildReportQuery = (filters: IReportFilters): string => {
+export const buildReportQuery = (userId: number, filters: IReportFilters): string => {
 	const { dateFrom, dateTo } = filters;
-	return queries.report(TABLES.transactions, dateFrom, dateTo);
+	return queries.report(`${TABLES.transactions}_${userId}`, dateFrom, dateTo);
 };

@@ -8,9 +8,10 @@ import { IFindFiltersOptions } from '@typings/common/findFilters';
 import { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
 export async function findTransactions(
+	userId: number,
 	params: IFindFiltersOptions,
 ): Promise<ITransaction[]> {
-	const { date, expense, category, note } = params;
+	const { date, expense, category, note, income } = params;
 
 	if (date && !isValidDate(date)) {
 		throw new ValidationError('Invalid date');
@@ -30,6 +31,10 @@ export async function findTransactions(
 		filters.expense = Number(expense);
 	}
 
+	if (income && !isNaN(Number(income))) {
+		filters.income = Number(income);
+	}
+
 	if (category) {
 		filters.category = String(category);
 	}
@@ -38,7 +43,7 @@ export async function findTransactions(
 		filters.note = String(note);
 	}
 
-	const query = buildFindQuery(filters);
+	const query = buildFindQuery(userId, filters);
 
 	try {
 		return await withConnection(async (sql) => {

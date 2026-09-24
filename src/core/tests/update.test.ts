@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { TEST_TABLE_ID } from '@db/consts';
 import { ValidationError } from '@lib/error';
 import type { ITransaction, ITransactionYDB } from '@typings/core/transaction';
 
@@ -34,6 +35,7 @@ const baseTransaction: ITransaction = {
 	id: 'test-id-123',
 	date: '2026-02-05',
 	expense: 500,
+	income: 0,
 	category: 'food',
 	note: 'groceries',
 	timestamp: '1738713600000',
@@ -59,31 +61,31 @@ describe('updateTransaction', () => {
 	describe('validation', () => {
 		it('throws ValidationError for missing id', async () => {
 			await expect(
-				updateTransaction({ ...baseTransaction, id: '' }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction, id: '' }),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				updateTransaction({ ...baseTransaction, id: '' }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction, id: '' }),
 			).rejects.toThrow('Update: Missing transaction id');
 		});
 
 		it('throws ValidationError for invalid date', async () => {
 			await expect(
-				updateTransaction({ ...baseTransaction, date: 'invalid-date' }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction, date: 'invalid-date' }),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				updateTransaction({ ...baseTransaction, date: 'invalid-date' }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction, date: 'invalid-date' }),
 			).rejects.toThrow('Update: Invalid date');
 		});
 
 		it('throws ValidationError for invalid expense (non-numeric)', async () => {
 			await expect(
-				updateTransaction({ ...baseTransaction, expense: 'not-a-number' as unknown as number }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 'not-a-number' as unknown as number }),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				updateTransaction({ ...baseTransaction, expense: 'not-a-number' as unknown as number }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 'not-a-number' as unknown as number }),
 			).rejects.toThrow('Update: Invalid expense value');
 		});
 
@@ -95,7 +97,7 @@ describe('updateTransaction', () => {
 			mockReadTransactionsFromYDB.mockReturnValue([]);
 
 			await expect(
-				updateTransaction({ ...baseTransaction }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction }),
 			).resolves.not.toThrow();
 		});
 	});
@@ -110,61 +112,67 @@ describe('updateTransaction', () => {
 		});
 
 		it('formats date field', async () => {
-			await updateTransaction({ ...baseTransaction, date: '2026-02-05T10:30:00Z' });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, date: '2026-02-05T10:30:00Z' });
 
 			expect(mockBuildUpdateQuery).toHaveBeenCalledWith(
+				1,
 				baseTransaction.id,
 				expect.objectContaining({ date: '2026-02-05' }),
 			);
 		});
 
 		it('converts expense to number', async () => {
-			await updateTransaction({ ...baseTransaction, expense: '750' as unknown as number });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: '750' as unknown as number });
 
 			expect(mockBuildUpdateQuery).toHaveBeenCalledWith(
+				1,
 				baseTransaction.id,
 				expect.objectContaining({ expense: 750 }),
 			);
 		});
 
 		it('converts category to lowercase and trims', async () => {
-			await updateTransaction({ ...baseTransaction, category: '  TRAVEL  ' });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, category: '  TRAVEL  ' });
 
 			expect(mockBuildUpdateQuery).toHaveBeenCalledWith(
+				1,
 				baseTransaction.id,
 				expect.objectContaining({ category: 'travel' }),
 			);
 		});
 
 		it('converts note to lowercase and trims', async () => {
-			await updateTransaction({ ...baseTransaction, note: '  Restaurant  ' });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, note: '  Restaurant  ' });
 
 			expect(mockBuildUpdateQuery).toHaveBeenCalledWith(
+				1,
 				baseTransaction.id,
 				expect.objectContaining({ note: 'restaurant' }),
 			);
 		});
 
 		it('sets category to null when null is passed', async () => {
-			await updateTransaction({ ...baseTransaction, category: null });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, category: null });
 
 			expect(mockBuildUpdateQuery).toHaveBeenCalledWith(
+				1,
 				baseTransaction.id,
 				expect.objectContaining({ category: null }),
 			);
 		});
 
 		it('sets note to null when null is passed', async () => {
-			await updateTransaction({ ...baseTransaction, note: null });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, note: null });
 
 			expect(mockBuildUpdateQuery).toHaveBeenCalledWith(
+				1,
 				baseTransaction.id,
 				expect.objectContaining({ note: null }),
 			);
 		});
 
 		it('processes multiple fields together', async () => {
-			await updateTransaction({
+			await updateTransaction(TEST_TABLE_ID, {
 				...baseTransaction,
 				date: '2026-03-01',
 				expense: 1000,
@@ -173,6 +181,7 @@ describe('updateTransaction', () => {
 			});
 
 			expect(mockBuildUpdateQuery).toHaveBeenCalledWith(
+				1,
 				baseTransaction.id,
 				expect.objectContaining({
 					date: '2026-03-01',
@@ -190,6 +199,7 @@ describe('updateTransaction', () => {
 				id: Buffer.from('test-id-123'),
 				date: new Date('2026-02-05'),
 				expense: BigInt(750),
+				income: BigInt(0),
 				category: Buffer.from('travel'),
 				note: Buffer.from('taxi'),
 				timestamp: BigInt(1738713600000),
@@ -200,6 +210,7 @@ describe('updateTransaction', () => {
 			id: 'test-id-123',
 			date: '2026-02-05',
 			expense: 750,
+			income: 0,
 			category: 'travel',
 			note: 'taxi',
 			timestamp: '1738713600000',
@@ -215,10 +226,11 @@ describe('updateTransaction', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue([mockUpdatedTransaction]);
 
-			await updateTransaction({ ...baseTransaction, expense: 750 });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 750 });
 
 			expect(mockBuildUpdateQuery).toHaveBeenCalledTimes(1);
 			expect(mockBuildUpdateQuery).toHaveBeenCalledWith(
+				1,
 				'test-id-123',
 				expect.objectContaining({ expense: 750 }),
 			);
@@ -230,7 +242,7 @@ describe('updateTransaction', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue([mockUpdatedTransaction]);
 
-			await updateTransaction({ ...baseTransaction, expense: 750 });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 750 });
 
 			expect(mockWithConnection).toHaveBeenCalledTimes(1);
 			expect(mockWithConnection).toHaveBeenCalledWith(expect.any(Function));
@@ -242,7 +254,7 @@ describe('updateTransaction', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue([mockUpdatedTransaction]);
 
-			await updateTransaction({ ...baseTransaction, expense: 750 });
+			await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 750 });
 
 			expect(mockReadTransactionsFromYDB).toHaveBeenCalledTimes(1);
 			expect(mockReadTransactionsFromYDB).toHaveBeenCalledWith(mockYdbData);
@@ -254,7 +266,7 @@ describe('updateTransaction', () => {
 			});
 			mockReadTransactionsFromYDB.mockReturnValue([mockUpdatedTransaction]);
 
-			const result = await updateTransaction({ ...baseTransaction, expense: 750 });
+			const result = await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 750 });
 
 			expect(result).toEqual([mockUpdatedTransaction]);
 			expect(result).toHaveLength(1);
@@ -271,7 +283,7 @@ describe('updateTransaction', () => {
 			const dbError = new Error('Database connection failed');
 			mockWithConnection.mockRejectedValue(dbError);
 
-			const result = await updateTransaction({ ...baseTransaction, expense: 750 });
+			const result = await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 750 });
 
 			expect(result).toEqual([]);
 		});
@@ -282,7 +294,7 @@ describe('updateTransaction', () => {
 				throw queryError;
 			});
 
-			const result = await updateTransaction({ ...baseTransaction, expense: 750 });
+			const result = await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 750 });
 
 			expect(result).toEqual([]);
 		});
@@ -296,18 +308,18 @@ describe('updateTransaction', () => {
 				throw transformError;
 			});
 
-			const result = await updateTransaction({ ...baseTransaction, expense: 750 });
+			const result = await updateTransaction(TEST_TABLE_ID, { ...baseTransaction, expense: 750 });
 
 			expect(result).toEqual([]);
 		});
 
 		it('does not catch validation errors', async () => {
 			await expect(
-				updateTransaction({ ...baseTransaction, id: '' }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction, id: '' }),
 			).rejects.toThrow(ValidationError);
 
 			await expect(
-				updateTransaction({ ...baseTransaction, date: 'invalid' }),
+				updateTransaction(TEST_TABLE_ID, { ...baseTransaction, date: 'invalid' }),
 			).rejects.toThrow(ValidationError);
 		});
 	});

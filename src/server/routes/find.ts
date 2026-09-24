@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
 import { findTransactions } from '@core';
+import { createCtx } from '@core/createCtx';
 import { HTTP_STATUS, ROUTE } from '@server/consts';
 import { IFindQueryParams } from '@typings/server/find';
 
@@ -9,10 +10,11 @@ export async function findRoutes(fastify: FastifyInstance): Promise<void> {
 		request: FastifyRequest<{ Querystring: IFindQueryParams }>,
 		reply: FastifyReply,
 	) => {
-		const { date, expense, category, note } = request.query;
+		const { date, expense, category, note, income } = request.query;
+		const ctx = createCtx(request);
 
 		try {
-			const result = await findTransactions({ date, expense, category, note });
+			const result = await findTransactions(ctx.userId, { date, expense, category, note, income });
 			return reply.status(HTTP_STATUS.OK).send({
 				status: 'ok',
 				data: result,
