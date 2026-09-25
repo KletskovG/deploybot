@@ -21,7 +21,7 @@ docker-down:
 	docker compose -f deployment/docker/docker-compose.yml down
 
 docker-logs:
-	docker compose -f deployment/docker/docker-compose.yml logs -f
+	docker compose -f deployment/docker/docker-compose.yml logs -f --since=1h
 
 docker-restart:
 	docker compose -f deployment/docker/docker-compose.yml restart
