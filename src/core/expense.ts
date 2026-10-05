@@ -19,14 +19,10 @@ export async function createExpense(
 		throw new ValidationError('Invalid date');
 	}
 
-	if (!expense) {
-		throw new ValidationError('Missing expense');
-	}
-
 	const transactionsList: ITransaction[] = [{
 		id: randomUUID(),
 		date: formatDate(new Date(date)),
-		expense: Number(expense),
+		expense: expense ? Number(expense) : 0,
 		income: income ? Number(income) : 0,
 		category: String(category).toLowerCase().trim() ?? null,
 		note: String(note).toLowerCase().trim() ?? null,
